@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "265696164054",
+    "project_id": "camphub-sirius-ee21d",
+    "storage_bucket": "camphub-sirius-ee21d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:265696164054:android:a2ffc70b333f5980357177",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6jIqzURVVRU6naC-G370MRVQEzl1ikX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
