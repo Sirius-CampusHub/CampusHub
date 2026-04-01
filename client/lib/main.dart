@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 
+import 'core/dependencies.dart';
 import 'module/app_shell.dart';
+import 'network/http_client.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+
+  final Dependencies dependencies = Dependencies(
+    dio: createAppHttpClient(),
+  );
+
+  runApp(
+    DependenciesScope(
+      dependencies: dependencies,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
