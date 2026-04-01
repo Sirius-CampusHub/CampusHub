@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'screens/auth_gate.dart';
 
-void main() async {
+import 'module/app_shell.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   runApp(const MyApp());
 }
 
@@ -19,11 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CampHub',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const AuthGate(),
+      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
+      home: const AppShell(),
     );
   }
 }
