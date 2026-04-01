@@ -12,6 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordRepeatController = TextEditingController();
 
   bool _isLogin = true;
   bool _isLoading = false;
@@ -20,9 +21,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final passwordRepeat = _passwordRepeatController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       setState(() => _error = 'Заполни все поля');
+      return;
+    } else if (!_isLogin && password != passwordRepeat) {
+      setState(() => _error = 'Пароли не сопадают');
       return;
     }
 
@@ -58,6 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _switchType(){
+    setState(() {
+      _isLogin = !_isLogin;
+      _error = null;
+    });
+  }
+
   String _getErrorMessage(String code) {
     switch (code) {
       case 'email-already-in-use':
@@ -81,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordRepeatController.dispose();
     super.dispose();
   }
 
@@ -93,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Логотип / заголовок
+              // TODO switch to logo
               const Icon(Icons.school, size: 80, color: Colors.blue),
               const SizedBox(height: 16),
               Text(
@@ -102,16 +115,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                _isLogin ? 'Войди в аккаунт' : 'Создай аккаунт',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey,
-                    ),
-              ),
               const SizedBox(height: 32),
 
-              // Email
+              // Email field
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -125,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Пароль
+              // Password field
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -139,7 +145,21 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Ошибка
+              // Repeat password field
+              _isLogin ? const SizedBox() : TextField(
+                controller: _passwordRepeatController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Повторите пароль',
+                  prefixIcon: Icon(Icons.lock_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Error display
               if (_error != null)
                 Container(
                   width: double.infinity,
@@ -155,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               if (_error != null) const SizedBox(height: 16),
 
-              // Кнопка
+              // Login/register button
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -183,14 +203,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Переключатель
+              // Switch auth type button
               TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isLogin = !_isLogin;
-                    _error = null;
-                  });
-                },
+                onPressed: () => _switchType(),
                 child: Text(
                   _isLogin
                       ? 'Нет аккаунта? Зарегистрируйся'
