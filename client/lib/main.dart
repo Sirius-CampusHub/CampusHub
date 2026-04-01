@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'core/dependencies.dart';
 import 'module/app_shell.dart';
 import 'network/http_client.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   final Dependencies dependencies = Dependencies(
     dio: createAppHttpClient(),
@@ -17,6 +18,9 @@ void main() {
       child: const MyApp(),
     ),
   );
+
+  FlutterNativeSplash.remove();
+
 }
 
 class MyApp extends StatelessWidget {
