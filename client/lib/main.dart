@@ -3,10 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'modules/auth/screens/auth_gate.dart';
 import 'utils/firebase_options.dart';
 
-void main() async {
+import 'core/dependencies.dart';
+import 'module/app_shell.dart';
+import 'network/http_client.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+
+  final Dependencies dependencies = Dependencies(
+    dio: createAppHttpClient(),
   );
   runApp(const MyApp());
 }
