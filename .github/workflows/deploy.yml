@@ -2,7 +2,7 @@ name: Deploy FastAPI
 
 on:
   push:
-    branches: [ feature/newspaper ]
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -26,8 +26,8 @@ jobs:
             fi
             
             git fetch origin
-            git checkout feature/newspaper
-            git pull origin feature/newspaper
+            git checkout main
+            git pull origin main
             
             cd backend
 
