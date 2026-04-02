@@ -69,13 +69,22 @@ class SiriusScheduleClient:
             }
         ]
 
-        for _ in range(week_offset):
+        if week_offset > 0:
+            method = "addWeek"
+            iterations = week_offset
+        elif week_offset < 0:
+            method = "minusWeek"
+            iterations = abs(week_offset)
+        else:
+            return updates
+
+        for _ in range(iterations):
             updates.append(
                 {
                     "type": "callMethod",
                     "payload": {
                         "id": component_id,
-                        "method": "addWeek",
+                        "method": method,
                         "params": [],
                     },
                 }
@@ -191,4 +200,7 @@ class SiriusScheduleClient:
 
 if __name__ == "__main__":
     client = SiriusScheduleClient()
-    client.fetch_schedule("ИОП-ИТ-24-1", 0)
+    print(client.fetch_schedule("ИОП-ИТ-24/1", 0))
+    print(client.fetch_schedule("ИОП-ИТ-24/1", 5))
+    print(client.fetch_schedule("ИОП-ИТ-24/1", -5))
+
