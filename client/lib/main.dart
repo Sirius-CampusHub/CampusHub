@@ -5,13 +5,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'module/auth/screens/auth_gate.dart';
 import 'utils/firebase_options.dart';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'core/dependencies.dart';
 import 'network/http_client.dart';
 
 void main() async {
-  // Initializations
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   final Dependencies dependencies = Dependencies(dio: createAppHttpClient());
 
@@ -26,6 +26,9 @@ void main() async {
       child: MyApp(),
     ),
   );
+
+  FlutterNativeSplash.remove();
+
 }
 
 class MyApp extends StatelessWidget {
