@@ -29,6 +29,8 @@ jobs:
             git checkout feature/newspaper
             git pull origin feature/newspaper
             
+            cd backend
+
             touch .env
             
             sed -i '/FIREBASE_CONFIG_BASE64/d' .env
