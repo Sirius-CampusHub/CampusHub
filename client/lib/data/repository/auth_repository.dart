@@ -10,7 +10,6 @@ class AuthRepository {
 
   final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Dio _dio = Dio(); 
 
   Stream<UserModel?> get userStream {
     return _auth.authStateChanges().asyncMap((firebaseUser) async {
