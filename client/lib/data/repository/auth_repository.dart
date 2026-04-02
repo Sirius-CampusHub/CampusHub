@@ -49,8 +49,6 @@ class AuthRepository {
       }
       await firebaseUser.getIdToken(true);
 
-      await firebaseUser.getIdToken(true);
-
       final newUser = UserModel(
         id: firebaseUser.uid,
         email: email,
