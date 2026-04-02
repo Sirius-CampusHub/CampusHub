@@ -1,4 +1,5 @@
 import 'package:client/domain/model/auth_event.dart';
+import 'package:client/domain/model/auth_state.dart';
 import 'package:client/domain/model/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordRepeatController = TextEditingController();
 
   bool _isLogin = true;
-  bool _isLoading = false;
   String? _error;
 
   Future<void> _submit() async {
@@ -32,19 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
     if (_isLogin) {
       context.read<AppBloc>().add(AuthSignInRequested(email: email, password: password));
     } else {
       context.read<AppBloc>().add(AuthSignUpRequested(email: email, password: password));
-    }
-
-    if (mounted) {
-      setState(() => _isLoading = false);
     }
   }
 
@@ -53,26 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLogin = !_isLogin;
       _error = null;
     });
-  }
-
-  // TODO get this from BLoC
-  String _getErrorMessage(String code) {
-    switch (code) {
-      case 'email-already-in-use':
-        return 'Этот email уже зарегистрирован';
-      case 'invalid-email':
-        return 'Некорректный email';
-      case 'weak-password':
-        return 'Пароль слишком слабый (мин. 6 символов)';
-      case 'user-not-found':
-        return 'Пользователь не найден';
-      case 'wrong-password':
-        return 'Неверный пароль';
-      case 'invalid-credential':
-        return 'Неверный email или пароль';
-      default:
-        return 'Ошибка: $code';
-    }
   }
 
   @override
@@ -89,65 +60,76 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // TODO switch to logo
-              const Icon(Icons.school, size: 80, color: Colors.blue),
-              const SizedBox(height: 16),
-              Text(
-                'CampHub',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+          child: BlocConsumer<AppBloc, AuthState>(
+            listener: (context, state)  {
+              // Syncing _error with error from BLoC
+              if (state is AuthError) {
+                AuthError authError = state;
+                setState(() {
+                  _error = authError.error;
+                });
+              } else if (_error != null) {
+                _error = null;
+              }
+            },
+            builder: (context, state) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // TODO switch to logo
+                const Icon(Icons.school, size: 80, color: Colors.blue),
+                const SizedBox(height: 16),
+                Text(
+                  'CampHub',
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 32),
+
+                // Email field
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
-              ),
-              const SizedBox(height: 32),
-
-              // Email field
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Password field
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Пароль',
-                  prefixIcon: Icon(Icons.lock_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                // Password field
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Пароль',
+                    prefixIcon: Icon(Icons.lock_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Repeat password field
-              _isLogin ? const SizedBox() : TextField(
-                controller: _passwordRepeatController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Повторите пароль',
-                  prefixIcon: Icon(Icons.lock_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                // Repeat password field
+                _isLogin ? const SizedBox() : TextField(
+                  controller: _passwordRepeatController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Повторите пароль',
+                    prefixIcon: Icon(Icons.lock_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Error display
-              if (_error != null)
-                Container(
+                // Error display
+                if (_error != null) Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -159,46 +141,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.red.shade700),
                   ),
                 ),
-              if (_error != null) const SizedBox(height: 16),
+                if (_error != null) const SizedBox(height: 16),
 
-              // Login/register button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton(
-                  onPressed: _isLoading ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                // Login/register button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: state is AuthLoading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+                    child: state is AuthLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            _isLogin ? 'Войти' : 'Зарегистрироваться',
+                            style: const TextStyle(fontSize: 16),
                           ),
-                        )
-                      : Text(
-                          _isLogin ? 'Войти' : 'Зарегистрироваться',
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Switch auth type button
-              TextButton(
-                onPressed: () => _switchType(),
-                child: Text(
-                  _isLogin
-                      ? 'Нет аккаунта? Зарегистрируйся'
-                      : 'Уже есть аккаунт? Войди',
+                // Switch auth type button
+                TextButton(
+                  onPressed: () => _switchType(),
+                  child: Text(
+                    _isLogin
+                        ? 'Нет аккаунта? Зарегистрируйся'
+                        : 'Уже есть аккаунт? Войди',
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
