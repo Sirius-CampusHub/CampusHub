@@ -1,0 +1,42 @@
+name: Deploy FastAPI
+
+on:
+  push:
+    branches: [ feature/newspaper ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            mkdir -p ~/app
+            cd ~/app
+            
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }}.git .
+            fi
+            
+            git fetch origin
+            git checkout feature/newspaper
+            git pull origin feature/newspaper
+            
+            touch .env
+            
+            sed -i '/FIREBASE_CONFIG_BASE64/d' .env
+            
+            echo "FIREBASE_CONFIG_BASE64=${{ secrets.FIREBASE_CONFIG_BASE64 }}" >> .env
+            
+            # sed -i '/OTHER_VAR/d' .env
+            # echo "OTHER_VAR=${{ secrets.OTHER_VAR }}" >> .env
+
+            docker compose down
+            docker compose up -d --build
