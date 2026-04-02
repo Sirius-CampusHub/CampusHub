@@ -1,3 +1,5 @@
+// Events of authentification for BLoC
+
 abstract class AuthEvent {}
 
 class AuthSignUpRequested extends AuthEvent {

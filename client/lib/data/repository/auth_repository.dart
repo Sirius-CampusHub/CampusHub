@@ -42,6 +42,10 @@ class AuthRepository {
       return newUser;
     } on firebase.FirebaseAuthException catch (e) {
       throw Exception('Ошибка регистрации: ${e.message}');
+    } catch (e) {
+      // TODO переделать на логирование
+      print("Caught error on signUp: ${e.toString()}");
+      rethrow;
     }
   }
 

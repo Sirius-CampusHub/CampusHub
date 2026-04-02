@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6f021bb-9f2c-4663-a4af-ffd62dd952f7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/lib/domain/model/auth_event.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/lib/domain/model/auth_state.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/lib/domain/model/bloc.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/domain/model/user_role.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/domain/model/user_role.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/modules/auth/screens/auth_gate.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/module/auth/screens/auth_gate.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/modules/auth/screens/home_screen.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/modules/auth/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/module/auth/screens/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/client/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pubspec.yaml" afterDir="false" />
-    </list>
+    <list default="true" id="b6f021bb-9f2c-4663-a4af-ffd62dd952f7" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

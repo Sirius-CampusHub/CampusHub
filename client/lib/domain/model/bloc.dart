@@ -27,6 +27,7 @@ class AppBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSubscriptionRequested>(_onSubscriptionRequest);
   }
 
+  // Authentication handlers
   Future<void> _onSignIn(
     AuthSignInRequested event,
     Emitter<AuthState> emit,

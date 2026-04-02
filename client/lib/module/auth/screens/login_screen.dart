@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
       context.read<AppBloc>().add(AuthSignUpRequested(email: email, password: password));
     }
 
-    // TODO get this from BLoC
     if (mounted) {
       setState(() => _isLoading = false);
     }

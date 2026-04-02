@@ -1,5 +1,6 @@
 import 'package:client/domain/model/model.dart';
 
+// States of authentification for BLoC
 abstract class AuthState {}
 
 class AuthInitial extends AuthState {}

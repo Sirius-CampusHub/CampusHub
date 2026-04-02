@@ -10,6 +10,7 @@ import 'core/dependencies.dart';
 import 'network/http_client.dart';
 
 void main() async {
+  // Initializations
   WidgetsFlutterBinding.ensureInitialized();
 
   final Dependencies dependencies = Dependencies(dio: createAppHttpClient());
