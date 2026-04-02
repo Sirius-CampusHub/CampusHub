@@ -7,7 +7,6 @@ from http.cookiejar import CookieJar
 import json
 import re
 from typing import Any
-from urllib.error import HTTPError, URLError
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
 ROOT_URL = "https://schedule.siriusuniversity.ru/"
@@ -26,7 +25,7 @@ class SiriusScheduleClient:
         cookie_jar = CookieJar()
         self._opener = build_opener(HTTPCookieProcessor(cookie_jar))
 
-    def fetch_schedule(self, group: str, week_offset: int) -> dict[str, Any]:
+    def fetch_schedule(self, group: str, week_offset: int) -> list[dict[str, Any]]:
         state = self._get_initial_state()
         updates = self._build_updates(state.fingerprint["id"], group, week_offset)
         payload = {
@@ -70,13 +69,22 @@ class SiriusScheduleClient:
             }
         ]
 
-        for _ in range(week_offset):
+        if week_offset > 0:
+            method = "addWeek"
+            iterations = week_offset
+        elif week_offset < 0:
+            method = "minusWeek"
+            iterations = abs(week_offset)
+        else:
+            return updates
+
+        for _ in range(iterations):
             updates.append(
                 {
                     "type": "callMethod",
                     "payload": {
                         "id": component_id,
-                        "method": "addWeek",
+                        "method": method,
                         "params": [],
                     },
                 }
@@ -101,7 +109,7 @@ class SiriusScheduleClient:
         with self._opener.open(req, timeout=30) as response:
             return json.loads(response.read().decode("utf-8"))
 
-    def _normalize_response(self, requested_group: str, week_offset: int, data: dict[str, Any]) -> dict[str, Any]:
+    def _normalize_response(self, requested_group: str, week_offset: int, data: dict[str, Any]) -> list[dict[str, Any]]:
         raw_events = data.get("events") or {}
         grouped: dict[str, dict[str, Any]] = {}
 
@@ -126,10 +134,6 @@ class SiriusScheduleClient:
                 if not date:
                     continue
 
-                # if day_week == 0:
-                #     print(event)
-
-
                 day_bucket = grouped.setdefault(
                     date,
                     {
@@ -140,8 +144,6 @@ class SiriusScheduleClient:
                 )
 
                 teachers = event.get("teachers") or {}
-                if event.get("date", None) == "04.04.2026":
-                    print(event["teachers"], "\n")
                 if isinstance(teachers, dict):
                     teacher_list = list(teachers.values())
                 else:
@@ -198,4 +200,7 @@ class SiriusScheduleClient:
 
 if __name__ == "__main__":
     client = SiriusScheduleClient()
-    client.fetch_schedule("ИОП-ИТ-24-1", 0)
+    print(client.fetch_schedule("ИОП-ИТ-24/1", 0))
+    print(client.fetch_schedule("ИОП-ИТ-24/1", 5))
+    print(client.fetch_schedule("ИОП-ИТ-24/1", -5))
+

@@ -99,7 +99,7 @@ class Schedule:
         # Choosing method to use.
         # If we need second week of different from previous group, then we need to change page to new group.
         if type(group) != str or type(next) != type(False):
-            raise TypeError('Group number must be a string. Type of variable next must be Bull.')
+            raise TypeError('Group number must be a string. Type of variable next must be bool.')
 
         session = aiohttp.ClientSession()
         session.headers.update({
@@ -257,7 +257,9 @@ class Schedule:
                 text = await resp.text()
         except Exception as e:
             await session.close()
-            raise NetworkError('')
+            raise NetworkError(
+                f"Failed to fetch classroom login page from {self.URL_LOGIN_CLASSROOM}: {e}"
+            ) from e
 
         soup = BeautifulSoup(text, 'html.parser')
         all_divs = soup.find_all('div')

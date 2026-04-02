@@ -10,7 +10,7 @@ enum UserRole {
         return UserRole.council;
       case 'student':
       default:
-        return UserRole.student; // Если что-то непонятное, делаем студентом (безопасно)
+        return UserRole.student; // Если что-то непонятное, делаем студентом
     }
   }
 }
