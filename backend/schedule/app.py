@@ -120,7 +120,6 @@ class SiriusScheduleClient:
         else:
             event_lists = []
 
-
         for event_list in event_lists:
             if not isinstance(event_list, list):
                 continue
@@ -203,4 +202,3 @@ if __name__ == "__main__":
     print(client.fetch_schedule("ИОП-ИТ-24/1", 0))
     print(client.fetch_schedule("ИОП-ИТ-24/1", 5))
     print(client.fetch_schedule("ИОП-ИТ-24/1", -5))
-

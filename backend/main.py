@@ -6,5 +6,4 @@ app = fastapi.FastAPI(
     version="0.0.0"
 )
 
-
 app.include_router(router)
