@@ -2,10 +2,11 @@ from pydantic import BaseModel, field_validator
 from typing import List
 
 
-class Day(BaseModel):
-    date: str | None
-    day_week: str | None
-    events: List[Event] | None
+class Teacher(BaseModel):
+    first_name: str | None
+    last_name: str | None
+    middle_name: str | None
+    fio: str | None
 
 
 class Event(BaseModel):
@@ -53,8 +54,7 @@ class Event(BaseModel):
         return value
 
 
-class Teacher(BaseModel):
-    first_name: str | None
-    last_name: str | None
-    middle_name: str | None
-    fio: str | None
+class Day(BaseModel):
+    date: str | None
+    day_week: str | None
+    events: List[Event] | None
