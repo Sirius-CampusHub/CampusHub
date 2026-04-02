@@ -1,5 +1,6 @@
 import 'package:client/data/repository/auth_repository.dart';
 import 'package:client/domain/model/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,17 +14,22 @@ void main() async {
   // Initializations
   WidgetsFlutterBinding.ensureInitialized();
 
-  final Dependencies dependencies = Dependencies(dio: createAppHttpClient());
+  Dio dio = createAppHttpClient();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  final authRepository = AuthRepository();
+  final authRepository = AuthRepository(dio: dio);
+
+  final Dependencies dependencies = Dependencies(authRepository: authRepository);
 
   runApp(
-    BlocProvider(
-      create: (_) =>
-          AppBloc(authRepository: authRepository, dependencies: dependencies),
-      child: MyApp(),
+    DependenciesScope(
+      dependencies: dependencies,
+      child: BlocProvider(
+        create: (_) =>
+            AuthBloc(authRepository: dependencies.authRepository),
+        child: MyApp(),
+      ),
     ),
   );
 }

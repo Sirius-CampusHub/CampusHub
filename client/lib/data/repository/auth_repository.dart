@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:client/domain/model/model.dart';
 
 class AuthRepository {
+
+  final Dio _dio;
+  AuthRepository({required Dio dio}) : _dio = dio;
+
   final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
