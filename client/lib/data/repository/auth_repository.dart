@@ -34,7 +34,7 @@ class AuthRepository {
 
       try {
         await _dio.post(
-          'https://твой-домен.ru/auth/init',
+          'https://siriusapi.kod.polytech-schedule.ru/auth/init',
           options: Options(
             headers: {
               'Authorization': 'Bearer $rawToken',
@@ -47,7 +47,6 @@ class AuthRepository {
         final errorMessage = dioError.response?.data?['detail'] ?? dioError.message;
         throw Exception("Ошибка инициализации на сервере: $errorMessage");
       }
-
       await firebaseUser.getIdToken(true);
 
       final newUser = UserModel(
@@ -65,8 +64,6 @@ class AuthRepository {
     } on firebase.FirebaseAuthException catch (e) {
       throw Exception('Ошибка регистрации: ${e.message}');
     } catch (e) {
-      // TODO переделать на логирование
-      print("Caught error on signUp: ${e.toString()}");
       rethrow;
     }
   }
