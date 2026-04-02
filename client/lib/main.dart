@@ -1,19 +1,30 @@
+import 'package:client/data/repository/auth_repository.dart';
+import 'package:client/domain/model/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'modules/auth/screens/auth_gate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'module/auth/screens/auth_gate.dart';
 import 'utils/firebase_options.dart';
 
 import 'core/dependencies.dart';
-import 'module/app_shell.dart';
 import 'network/http_client.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final Dependencies dependencies = Dependencies(
-    dio: createAppHttpClient(),
+  final Dependencies dependencies = Dependencies(dio: createAppHttpClient());
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final authRepository = AuthRepository();
+
+  runApp(
+    BlocProvider(
+      create: (_) =>
+          AppBloc(authRepository: authRepository, dependencies: dependencies),
+      child: MyApp(),
+    ),
   );
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,10 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CampHub',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
       home: const AuthGate(),
     );
   }

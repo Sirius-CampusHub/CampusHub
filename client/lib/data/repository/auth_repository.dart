@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:client/domain/model/model.dart';
 
 class AuthRepository {
-
   final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -16,7 +15,10 @@ class AuthRepository {
     });
   }
 
-  Future<UserModel> signUp({required String email, required String password}) async {
+  Future<UserModel> signUp({
+    required String email,
+    required String password,
+  }) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -32,7 +34,10 @@ class AuthRepository {
         role: UserRole.student,
       );
 
-      await _firestore.collection('users').doc(newUser.id).set(newUser.toFirestore());
+      await _firestore
+          .collection('users')
+          .doc(newUser.id)
+          .set(newUser.toFirestore());
 
       return newUser;
     } on firebase.FirebaseAuthException catch (e) {
@@ -40,7 +45,10 @@ class AuthRepository {
     }
   }
 
-  Future<UserModel> signIn({required String email, required String password}) async {
+  Future<UserModel> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -53,12 +61,21 @@ class AuthRepository {
       return await _fetchUserFromFirestore(firebaseUser);
     } on firebase.FirebaseAuthException catch (e) {
       throw Exception('Ошибка входа: ${e.message}');
+    } catch (e) {
+      print(
+        'Непредвиденная ошибка во время входа: ${e.toString()}',
+      ); // TODO переделать на логирование
+      rethrow;
     }
   }
 
   Future<String?> getToken() async {
     final firebaseUser = _auth.currentUser;
-    return await firebaseUser?.getIdToken(); 
+    try {
+      return await firebaseUser?.getIdToken();
+    } catch (e) {
+      rethrow; // TODO add logging
+    }
   }
 
   Future<void> signOut() async {
@@ -67,15 +84,18 @@ class AuthRepository {
 
   Future<UserModel> _fetchUserFromFirestore(firebase.User firebaseUser) async {
     try {
-      final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
-      
+      final doc = await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+
       if (doc.exists && doc.data() != null) {
         return UserModel.fromFirestore(doc.id, doc.data()!);
       }
     } catch (e) {
       print('Ошибка чтения из Firestore: $e'); //todo изменить на логирование
     }
-    
+
     return UserModel(
       id: firebaseUser.uid,
       email: firebaseUser.email ?? '',

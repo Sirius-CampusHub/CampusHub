@@ -1,5 +1,7 @@
+import 'package:client/domain/model/auth_event.dart';
+import 'package:client/domain/model/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,7 +11,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordRepeatController = TextEditingController();
@@ -36,30 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
 
-    try {
-      if (_isLogin) {
-        await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      } else {
-        await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = _getErrorMessage(e.code);
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Произошла ошибка: $e';
-      });
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    if (_isLogin) {
+      context.read<AppBloc>().add(AuthSignInRequested(email: email, password: password));
+    } else {
+      context.read<AppBloc>().add(AuthSignUpRequested(email: email, password: password));
+    }
+
+    // TODO get this from BLoC
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -70,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  // TODO get this from BLoC
   String _getErrorMessage(String code) {
     switch (code) {
       case 'email-already-in-use':

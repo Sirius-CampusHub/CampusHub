@@ -16,6 +16,8 @@ dependencies:
   firebase_auth: ^6.3.0
   cloud_firestore: ^6.2.0
   dio: ^5.9.0
+  bloc: ^9.2.0
+  flutter_bloc: ^9.1.1
 
 dev_dependencies:
 
