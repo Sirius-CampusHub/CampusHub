@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase;
 class FirebaseAuthDataSource {
   final firebase.FirebaseAuth _auth;
 
-  FirebaseAuthDataSource({firebase.FirebaseAuth? auth}) 
-      : _auth = auth ?? firebase.FirebaseAuth.instance;
+  FirebaseAuthDataSource({firebase.FirebaseAuth auth}) 
+      : _auth = auth;
 
   Stream<firebase.User?> get authStateChanges => _auth.authStateChanges();
 
