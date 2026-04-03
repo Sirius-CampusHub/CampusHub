@@ -1,51 +1,79 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:client/domain/model/news_model.dart';
+import 'package:client/domain/model/model.dart';
 
 class NewsRepository {
   final Dio _dio;
 
+  //TODO ВЫНЕСТИ
+  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/news';
+
   NewsRepository({required Dio dio}) : _dio = dio;
 
-  Stream<List<NewsModel>> getNewsStream() async* {
-    await Future.delayed(const Duration(milliseconds: 500));
-    yield [
-      NewsModel(id: '1', title: 'The question of universe, life and everything', content: '42', imageUrl: "https://media.istockphoto.com/id/1487223877/ru/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F/%D1%81%D0%B8%D0%BC%D0%BF%D0%B0%D1%82%D0%B8%D1%87%D0%BD%D1%8B%D0%B9-%D0%BC%D1%83%D0%BB%D1%8C%D1%82%D1%8F%D1%88%D0%BD%D1%8B%D0%B9-%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%BD%D0%B0%D0%B6-%D0%BA%D1%80%D0%BE%D0%BA%D0%BE%D0%B4%D0%B8%D0%BB%D0%B0.jpg?s=612x612&w=is&k=20&c=EV3-u6l0F1vhyV8TV10ngGe4gkXU-qlt3H0Sga_iq2s=", createdAt: DateTime(0)),
-      NewsModel(id: '2', title: 'Hallo', content: 'world', createdAt: DateTime(1)),
-      NewsModel(id: '3', title: 'Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long title', content: 'Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long body', createdAt: DateTime(2)),
-    ];
-  }
-
-  Future<String?> uploadImage(File imageFile) async {
+  Future<List<NewsModel>> getAllNews() async {
     try {
-      //TODO отправить картинку на сервер
-      return "";
-    } catch (e) {
-      rethrow;
+      final response = await _dio.get('$_baseUrl/');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => NewsModel.fromJson(json)).toList();
+      } else {
+        throw Exception("Не удалось загрузить новости");
+      }
+    } on DioException catch (e) {
+      throw Exception("Ошибка сети при загрузке новостей: ${e.message}");
     }
   }
 
-  Future<void> createNews({
+  Future<NewsModel> createNews({
     required String title,
     required String content,
     File? imageFile,
   }) async {
-    String? imageUrl;
-    if (imageFile != null) {
-      imageUrl = await uploadImage(imageFile);
+    try {
+      final formData = FormData.fromMap({
+        "title": title,
+        "content": content,
+      });
+
+      if (imageFile != null) {
+        formData.files.add(MapEntry(
+          "image",
+          await MultipartFile.fromFile(
+            imageFile.path,
+            filename: imageFile.path.split('/').last,
+          ),
+        ));
+      }
+
+      final response = await _dio.post(
+        '$_baseUrl/',
+        data: formData,
+      );
+
+      return NewsModel.fromJson(response.data);
+
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
+      } else if (e.response?.statusCode == 400) {
+        throw Exception("Слишком большой файл или неверный формат (макс 2 МБ).");
+      }
+      final errorDetail = e.response?.data?['detail'] ?? e.message;
+      throw Exception("Ошибка создания новости: $errorDetail");
     }
-    final news = NewsModel(
-      id: '',
-      title: title,
-      content: content,
-      imageUrl: imageUrl,
-      createdAt: DateTime.now(),
-    );
-    //TODO отправить новость на сервер
   }
 
-  Future<void> deleteNews(String id) async {
-    //TODO удалить новость с сервера
+  Future<void> deleteNews(String newsId) async {
+    try {
+      await _dio.delete('$_baseUrl/$newsId');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        throw Exception("Доступ запрещен. Только студсовет может удалять новости.");
+      } else if (e.response?.statusCode == 404) {
+        throw Exception("Новость не найдена (возможно, уже удалена).");
+      }
+      throw Exception("Ошибка удаления: ${e.message}");
+    }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:client/data/repository/news_repository.dart';
+import 'package:client/data/repository/repository.dart';
 import 'news_event.dart';
 import 'news_state.dart';
 
@@ -17,7 +17,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   Future<void> _onFetchNews(FetchNews event, Emitter<NewsState> emit) async {
     emit(NewsLoading());
     try {
-      final snapshot = await _repository.getNewsStream().first;
+      final snapshot = await _repository.getAllNews();
       emit(NewsLoaded(snapshot));
     } catch (e) {
       emit(NewsError(e.toString()));

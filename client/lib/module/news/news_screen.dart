@@ -44,9 +44,13 @@ class _NewsScreenState extends State<NewsScreen> {
                 final news = newsList[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
                   clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
+                  child: GestureDetector(
+                    // onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
+                    onLongPress: () => _confirmDelete(context, news.id),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -94,11 +98,10 @@ class _NewsScreenState extends State<NewsScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 news.content,
-                                style: const TextStyle(fontSize: 14),
-                                maxLines: 5,
+                                style: const TextStyle(fontSize: 15),
+                                maxLines: 8,
                                 overflow: TextOverflow.ellipsis,
                               ),
-
                             ],
                           ),
                         ),
@@ -109,13 +112,15 @@ class _NewsScreenState extends State<NewsScreen> {
               },
             );
           } else if (state is NewsError) {
-            return Center(child: Text('Ошибка: ${state.message}'));
+            print('Ошибка: ${state.message}');
+            return Center(child: Text('Возникла ошибка'));
           }
           return const SizedBox();
         },
       ),
-      floatingActionButton: isAdmin
-          ? FloatingActionButton(
+      // floatingActionButton: isAdmin
+      floatingActionButton:
+           FloatingActionButton(
         onPressed: () async {
           final created = await Navigator.push<bool>(
             context,
@@ -126,8 +131,7 @@ class _NewsScreenState extends State<NewsScreen> {
           }
         },
         child: const Icon(Icons.add),
-      )
-          : null,
+           ),
     );
   }
 
@@ -163,3 +167,4 @@ class _NewsScreenState extends State<NewsScreen> {
     return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
+
