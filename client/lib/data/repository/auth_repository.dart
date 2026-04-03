@@ -49,6 +49,9 @@ class AuthRepository {
       }
       await firebaseUser.getIdToken(true);
 
+      final token = await firebaseUser.getIdToken(true);
+print("Bearer $token");
+
       final newUser = UserModel(
         id: firebaseUser.uid,
         email: email,
@@ -80,7 +83,8 @@ class AuthRepository {
 
       final firebaseUser = credential.user;
       if (firebaseUser == null) throw Exception("Пользователь не найден");
-
+      final token = await firebaseUser.getIdToken(true);
+print("Bearer $token");
       return await _fetchUserFromFirestore(firebaseUser);
     } on firebase.FirebaseAuthException catch (e) {
       throw Exception('Ошибка входа: ${e.message}');
