@@ -81,7 +81,7 @@ async def do_something_secret(user: dict = Depends(get_current_user)):
 
 
 
-//TODO УДАЛИТЬ ЭТУ АПИШКУ КОГДА БУДУТ ИТОГОВЫЕ ПОЛЬЗОВАТЕЛИ.
+# TODO УДАЛИТЬ ЭТУ АПИШКУ КОГДА БУДУТ ИТОГОВЫЕ ПОЛЬЗОВАТЕЛИ.
 @router.post("/test-make-me-council")
 async def make_me_council(
         db_postgres: AsyncSession = Depends(get_db),
