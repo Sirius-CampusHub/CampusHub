@@ -1,0 +1,86 @@
+// Models imports
+import 'package:client/domain/model/model.dart';
+
+import 'auth_state.dart';
+import 'auth_event.dart';
+
+// Packages imports
+import 'package:bloc/bloc.dart';
+
+// Repos imports
+import 'package:client/data/repository/auth_repository.dart';
+
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final AuthRepository _authRepository;
+
+  AuthBloc({
+    required AuthRepository authRepository,
+  }) : _authRepository = authRepository,
+       super(AuthInitial()) {
+    on<AuthSignInRequested>(_onSignIn);
+    on<AuthSignUpRequested>(_onSignUp);
+    on<AuthSignOutRequested>(_onSignOut);
+    on<AuthSubscriptionRequested>(_onSubscriptionRequest);
+  }
+
+  // Authentication handlers
+  Future<void> _onSignIn(
+    AuthSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final UserModel user = await _authRepository.signIn(
+        email: event.email,
+        password: event.password,
+      );
+      emit(AuthAuthenticated(user: user));
+    } catch (e) {
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
+    }
+  }
+
+  Future<void> _onSignUp(
+    AuthSignUpRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final UserModel user = await _authRepository.signUp(
+        email: event.email,
+        password: event.password,
+      );
+      emit(AuthAuthenticated(user: user));
+    } catch (e) {
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
+    }
+  }
+
+  Future<void> _onSignOut(
+    AuthSignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await _authRepository.signOut();
+      emit(AuthUnauthenticated());
+    } catch (e) {
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
+    }
+  }
+
+  Future<void> _onSubscriptionRequest(
+    AuthSubscriptionRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit.forEach<UserModel?>(
+      _authRepository.userStream,
+      onData: (data) =>
+          data != null ? AuthAuthenticated(user: data) : AuthUnauthenticated(),
+      onError: (e, stackTrace) => AuthError(error: e as Exception),
+    );
+  }
+}
