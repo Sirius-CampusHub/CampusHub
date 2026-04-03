@@ -1,7 +1,7 @@
 import fastapi
 
-from schedule import routes
-from auth import  auth_routes
+from schedule import router
+from auth import auth_routes
 
 import os
 import json
@@ -38,5 +38,5 @@ app = fastapi.FastAPI(
     version="0.0.0"
 )
 
-app.include_router(routes.router)
+app.include_router(router)
 app.include_router(auth_routes.router)
