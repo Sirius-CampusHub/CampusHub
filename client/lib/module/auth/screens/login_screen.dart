@@ -1,7 +1,9 @@
 import 'package:client/domain/model/auth_event.dart';
 import 'package:client/domain/model/auth_state.dart';
 import 'package:client/domain/model/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -39,6 +41,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  String? _getErrorMessage(Exception error) {
+    if (error is firebase.FirebaseAuthException) {
+      switch (error.code) {
+        case 'wrong-password':
+          return 'Неверные почта или пароль';
+        case 'user-disabled':
+          return 'Неверные почта или пароль.';
+        case 'user-not-found':
+          return 'Неверные почта или пароль.';
+        case 'invalid-credential':
+          return 'Неверные почта или пароль.';
+        case 'email-already-in-use':
+          return 'Эта почта уже используется.';
+        case 'invalid-email':
+          return 'Неправильный формат почты.';
+        case 'weak-password':
+          return 'Слабый пароль.';
+        case 'no-current-user':
+          return null;
+        default:
+          return 'Ошибка ${_isLogin ? "входа" : "регистрации"}.';
+      }
+    } else if (error is DioException) {
+      return 'Ошибка соединения.';
+    } else {
+      return 'Ошибка ${_isLogin ? "входа" : "регистрации"}.';
+    }
+  }
+
   void _switchType(){
     setState(() {
       _isLogin = !_isLogin;
@@ -66,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (state is AuthError) {
                 AuthError authError = state;
                 setState(() {
-                  _error = authError.error;
+                  _error = _getErrorMessage(authError.error);
                 });
               } else if (_error != null) {
                 _error = null;

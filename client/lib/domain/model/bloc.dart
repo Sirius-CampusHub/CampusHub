@@ -36,7 +36,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(error: e.toString()));
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
     }
   }
 
@@ -52,7 +53,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(error: e.toString()));
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
     }
   }
 
@@ -65,7 +67,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.signOut();
       emit(AuthUnauthenticated());
     } catch (e) {
-      emit(AuthError(error: e.toString()));
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
     }
   }
 
@@ -77,7 +80,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _authRepository.userStream,
       onData: (data) =>
           data != null ? AuthAuthenticated(user: data) : AuthUnauthenticated(),
-      onError: (e, stackTrace) => AuthError(error: e.toString()),
+      onError: (e, stackTrace) => AuthError(error: e as Exception),
     );
   }
 }

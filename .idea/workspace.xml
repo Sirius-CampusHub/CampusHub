@@ -6,15 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="daf2be01-13ab-46cb-b3c0-2f1ec612b0d4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/core/dependencies.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/core/dependencies.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/lib/domain/model/auth_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/domain/model/auth_state.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/lib/domain/model/bloc.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/domain/model/bloc.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/lib/module/auth/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/module/auth/screens/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/lib/module/profile/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/module/profile/profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/client/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/client/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/client/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
