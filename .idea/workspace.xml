@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6f021bb-9f2c-4663-a4af-ffd62dd952f7" name="Changes" comment="">
+    <list default="true" id="daf2be01-13ab-46cb-b3c0-2f1ec612b0d4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/data/repository/auth_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/lib/domain/model/auth_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/domain/model/auth_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/lib/domain/model/bloc.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/domain/model/bloc.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/lib/module/auth/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client/lib/module/auth/screens/login_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,56 +19,44 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Dart File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 6
+  &quot;associatedIndex&quot;: 8
 }</component>
-  <component name="ProjectId" id="3BiEiO8j0bBiw5Jc8rveRR0GUFF" />
+  <component name="ProjectId" id="3BnsK1qWN533FKVdxKcbLMQlA99" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "registration",
-    "last_opened_file_path": "C:/Users/Gleb/Documents/working_projects/campus_hab/CampusHub",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "vcs.Git",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/errors__displaying&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Gleb\Documents\working_projects\campus_hab\CampusHub\client\lib\module" />
-    </key>
-  </component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b6f021bb-9f2c-4663-a4af-ffd62dd952f7" name="Changes" comment="" />
-      <created>1774963616889</created>
+      <changelist id="daf2be01-13ab-46cb-b3c0-2f1ec612b0d4" name="Changes" comment="" />
+      <created>1775136101782</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1774963616889</updated>
+      <updated>1775136101782</updated>
     </task>
     <servers />
   </component>

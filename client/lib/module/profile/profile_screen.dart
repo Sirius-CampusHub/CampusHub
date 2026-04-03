@@ -14,7 +14,7 @@ class ProfileScreen extends StatelessWidget {
         Text('Профиль'),
         // Just for testing
         ElevatedButton(onPressed: () {
-          context.read<AppBloc>().add(AuthSignOutRequested());
+          context.read<AuthBloc>().add(AuthSignOutRequested());
         }, child: Text('UnLog')),
       ],
     ));

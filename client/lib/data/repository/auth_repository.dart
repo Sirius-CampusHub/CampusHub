@@ -43,7 +43,8 @@ class AuthRepository {
       } on DioException catch (dioError) {
         await _authDataSource.deleteCurrentUser();
         final errorMessage = dioError.response?.data?['detail'] ?? dioError.message;
-        throw Exception("Ошибка инициализации на сервере: $errorMessage");
+        print("Ошибка инициализации на сервере: $errorMessage");
+        rethrow;
       }
       
       await _authDataSource.getToken(forceRefresh: true);
@@ -56,6 +57,9 @@ class AuthRepository {
       await _firestoreDataSource.saveUser(newUser);
 
       return newUser;
+    } on firebase.FirebaseAuthException catch (e) {
+      print('Ошибка при регистрации.');
+      rethrow;
     } catch (e) {
       // TODO: Логирование
       rethrow;

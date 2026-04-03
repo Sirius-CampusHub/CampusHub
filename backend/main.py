@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 import fastapi
 from fastapi.staticfiles import StaticFiles # Импорт для раздачи файлов
+from schedule import router
+from auth import auth_routes
 import os
 import json
 import base64
@@ -44,8 +46,9 @@ app = fastapi.FastAPI(
     lifespan=lifespan
 )
 
-app.mount("/static", StaticFiles(directory="uploads"), name="static")
 
+app.mount("/static", StaticFiles(directory="uploads"), name="static")
+app.include_router(router)
 app.include_router(auth_routes.router)
 app.include_router(news_routes.router)
 app.include_router(routes.router)
