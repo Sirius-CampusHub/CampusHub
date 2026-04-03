@@ -12,7 +12,7 @@ class News(Base):
     content = Column(Text, nullable=False)
     image_url = Column(String, nullable=True)
     author_id = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(datetime.UTC))
 
 
 
@@ -26,4 +26,4 @@ class User(Base):
     id = Column(String, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     role = Column(String, default="student")
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(datetime.UTC))

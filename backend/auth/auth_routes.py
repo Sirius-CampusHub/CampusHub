@@ -46,14 +46,30 @@ async def init_new_user(
     try:
         auth.set_custom_user_claims(uid, {"role": "student"})
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Ошибка при назначении роли")
+        raise HTTPException(status_code=500, detail=f"Firebase error: {e}")
 
-    new_user = DBUser(id=uid, email=email, role="student")
-    db.add(new_user)
-    await db.commit()
-
-    return {"status": "ok"}
-
+    try:
+        stmt = insert(DBUser).values(
+            id=uid, 
+            email=email, 
+            role="student"
+        )
+        
+        stmt = stmt.on_conflict_do_update(
+            index_elements=['id'],
+            set_={
+                "email": email,
+                "role": "student"
+            }
+        )
+        
+        await db.execute(stmt)
+        await db.commit()
+        return {"status": "ok"}
+        
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/admin-action")
 async def do_something_secret(user: dict = Depends(get_current_user)):
@@ -64,6 +80,8 @@ async def do_something_secret(user: dict = Depends(get_current_user)):
     return {"message": "Секретное действие выполнено"}
 
 
+
+//TODO УДАЛИТЬ ЭТУ АПИШКУ КОГДА БУДУТ ИТОГОВЫЕ ПОЛЬЗОВАТЕЛИ.
 @router.post("/test-make-me-council")
 async def make_me_council(
         db_postgres: AsyncSession = Depends(get_db),

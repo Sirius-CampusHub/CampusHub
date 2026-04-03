@@ -1,26 +1,18 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:client/domain/model/model.dart';
-import 'auth_repository.dart';
 
 class NewsRepository {
-  final Dio _dio = Dio();
-  final AuthRepository _authRepo;
+  final Dio _dio;
 
+  //TODO ВЫНЕСТИ
   static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/news';
 
-  NewsRepository({required AuthRepository authRepo}) : _authRepo = authRepo;
-
-  Future<Options> _getAuthOptions() async {
-    final token = await _authRepo.getToken();
-    if (token == null) throw Exception("Пользователь не авторизован");
-    return Options(headers: {'Authorization': 'Bearer $token'});
-  }
+  NewsRepository({required Dio dio}) : _dio = dio;
 
   Future<List<NewsModel>> getAllNews() async {
     try {
-      final options = await _getAuthOptions();
-      final response = await _dio.get('$_baseUrl/', options: options);
+      final response = await _dio.get('$_baseUrl/');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -39,8 +31,6 @@ class NewsRepository {
     File? imageFile,
   }) async {
     try {
-      final options = await _getAuthOptions();
-
       final formData = FormData.fromMap({
         "title": title,
         "content": content,
@@ -59,7 +49,6 @@ class NewsRepository {
       final response = await _dio.post(
         '$_baseUrl/',
         data: formData,
-        options: options,
       );
 
       return NewsModel.fromJson(response.data);
@@ -77,10 +66,7 @@ class NewsRepository {
 
   Future<void> deleteNews(String newsId) async {
     try {
-      final options = await _getAuthOptions();
-      
-      await _dio.delete('$_baseUrl/$newsId', options: options);
-      
+      await _dio.delete('$_baseUrl/$newsId');
     } on DioException catch (e) {
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Только студсовет может удалять новости.");
