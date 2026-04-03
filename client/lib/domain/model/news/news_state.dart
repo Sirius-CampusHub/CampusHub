@@ -1,4 +1,4 @@
-import 'package:client/domain/model/news/news_model.dart';
+import 'package:client/domain/model/news_model.dart';
 
 abstract class NewsState {}
 

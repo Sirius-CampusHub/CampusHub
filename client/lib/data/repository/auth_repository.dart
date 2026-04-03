@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:client/domain/model/model.dart';
 
 class AuthRepository {
+
+  final Dio _dio;
+  AuthRepository({required Dio dio}) : _dio = dio;
+
   final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -28,6 +33,25 @@ class AuthRepository {
       final firebaseUser = credential.user;
       if (firebaseUser == null) throw Exception("Ошибка создания пользователя");
 
+      final rawToken = await firebaseUser.getIdToken();
+
+      try {
+        await _dio.post(
+          'https://siriusapi.kod.polytech-schedule.ru/auth/init',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $rawToken',
+            },
+          ),
+        );
+      } on DioException catch (dioError) {
+        await firebaseUser.delete();
+        
+        final errorMessage = dioError.response?.data?['detail'] ?? dioError.message;
+        throw Exception("Ошибка инициализации на сервере: $errorMessage");
+      }
+      await firebaseUser.getIdToken(true);
+
       final newUser = UserModel(
         id: firebaseUser.uid,
         email: email,
@@ -43,8 +67,6 @@ class AuthRepository {
     } on firebase.FirebaseAuthException catch (e) {
       throw Exception('Ошибка регистрации: ${e.message}');
     } catch (e) {
-      // TODO переделать на логирование
-      print("Caught error on signUp: ${e.toString()}");
       rethrow;
     }
   }

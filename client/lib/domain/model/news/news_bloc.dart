@@ -6,7 +6,9 @@ import 'news_state.dart';
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsRepository _repository;
 
-  NewsBloc(this._repository) : super(NewsInitial()) {
+  NewsBloc({
+    required NewsRepository newsRepository,
+  }) : _repository = newsRepository, super(NewsInitial()) {
     on<FetchNews>(_onFetchNews);
     on<CreateNews>(_onCreateNews);
     on<DeleteNews>(_onDeleteNews);
@@ -15,7 +17,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   Future<void> _onFetchNews(FetchNews event, Emitter<NewsState> emit) async {
     emit(NewsLoading());
     try {
-      // Используем stream для реального времени, но для простоты возьмём одноразовую загрузку
       final snapshot = await _repository.getNewsStream().first;
       emit(NewsLoaded(snapshot));
     } catch (e) {

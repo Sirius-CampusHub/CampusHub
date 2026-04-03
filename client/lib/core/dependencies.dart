@@ -1,23 +1,42 @@
+import 'package:client/data/repository/auth_repository.dart';
+import 'package:client/data/repository/news_repository.dart';
 import 'package:dio/dio.dart';
-import '../data/repository/news_repository.dart';
+import 'package:flutter/widgets.dart';
 
 
 final class Dependencies {
   const Dependencies({
-    required this.dio,
+    required this.authRepository,
     required this.newsRepository,
+
   });
 
-  final Dio dio;
+  final AuthRepository authRepository;
   final NewsRepository newsRepository;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Dependencies &&
-          runtimeType == other.runtimeType &&
-          dio == other.dio;
+}
+
+class DependenciesScope extends InheritedWidget {
+  const DependenciesScope({
+    super.key,
+    required this.dependencies,
+    required super.child,
+  });
+
+  final Dependencies dependencies;
+
+  static Dependencies of(BuildContext context) {
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<DependenciesScope>();
+    assert(scope != null, 'DependenciesScope не найден в дереве');
+    return scope!.dependencies;
+  }
 
   @override
-  int get hashCode => dio.hashCode;
+  bool updateShouldNotify(DependenciesScope oldWidget) =>
+      dependencies != oldWidget.dependencies;
+}
+
+extension DependenciesContext on BuildContext {
+  Dependencies get dependencies => DependenciesScope.of(this);
 }

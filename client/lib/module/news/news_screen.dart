@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:client/domain/model/news/news_bloc.dart';
 import 'package:client/domain/model/user_role.dart';
 import 'package:client/domain/model/bloc.dart';
 import 'package:client/domain/model/auth_state.dart';
 import '../../domain/model/news/news_event.dart';
 import '../../domain/model/news/news_state.dart';
-import 'news_detail_screen.dart';
 import 'create_news_screen.dart';
 
-class NewsScreen extends StatelessWidget {
+class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
+
+  @override
+  State<NewsScreen> createState() => _NewsScreenState();
+}
+
+class _NewsScreenState extends State<NewsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<NewsBloc>().add(FetchNews());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,45 +38,72 @@ class NewsScreen extends StatelessWidget {
               return const Center(child: Text('Нет новостей'));
             }
             return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: newsList.length,
               itemBuilder: (context, index) {
                 final news = newsList[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: news.imageUrl != null
-                          ? Image.network(
-                        news.imageUrl!,
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 60),
-                      )
-                          : Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image, size: 40),
-                      ),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (news.imageUrl != null && news.imageUrl!.isNotEmpty)
+                        CachedNetworkImage(
+                          imageUrl: news.imageUrl!,
+                          width: double.infinity,
+                          fit: BoxFit.fitWidth,
+                          placeholder: (context, url) => const AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                          errorWidget: (context, url, error) => const AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Icon(Icons.broken_image, size: 80),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      news.title,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _formatDate(news.createdAt),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                news.content,
+                                style: const TextStyle(fontSize: 14),
+                                maxLines: 5,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    title: Text(news.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(
-                      news.content.length > 80 ? '${news.content.substring(0, 80)}...' : news.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    isThreeLine: true,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => NewsDetailScreen(news: news)),
-                      );
-                    },
-                    onLongPress: isAdmin
-                        ? () => _confirmDelete(context, news.id)
-                        : null,
                   ),
                 );
               },
@@ -94,7 +132,7 @@ class NewsScreen extends StatelessWidget {
   }
 
   bool _isAdmin(BuildContext context) {
-    final authState = context.read<AppBloc>().state;
+    final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
       return authState.user.role == UserRole.council;
     }
@@ -119,5 +157,9 @@ class NewsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
