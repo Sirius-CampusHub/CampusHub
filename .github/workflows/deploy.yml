@@ -35,10 +35,10 @@ jobs:
             
             sed -i '/FIREBASE_CONFIG_BASE64/d' .env
             
-            echo "FIREBASE_CONFIG_BASE64=${{ secrets.FIREBASE_CONFIG_BASE64 }}" >> .env
-            
-            # sed -i '/OTHER_VAR/d' .env
-            # echo "OTHER_VAR=${{ secrets.OTHER_VAR }}" >> .env
+            echo "FIREBASE_CONFIG_BASE64='${{ secrets.FIREBASE_CONFIG_BASE64 }}'" > .env
+            echo "DB_USER='${{ secrets.DB_USER }}'" >> .env
+            echo "DB_PASSWORD='${{ secrets.DB_PASSWORD }}'" >> .env
+            echo "DB_NAME='${{ secrets.DB_NAME }}'" >> .env
 
             docker compose down
             docker compose up -d --build
