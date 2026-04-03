@@ -1,8 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
-from .parser import Schedule  # Понадобится позже
-from .app import SiriusScheduleClient
+from .parser import SiriusScheduleClient
 from .models import Day
 
 router = APIRouter(

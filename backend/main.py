@@ -1,7 +1,7 @@
 import fastapi
 
 from schedule import router
-from auth import  auth_routes
+from auth import auth_routes
 
 import os
 import json
