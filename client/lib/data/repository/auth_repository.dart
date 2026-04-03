@@ -48,7 +48,8 @@ class AuthRepository {
         await firebaseUser.delete();
         
         final errorMessage = dioError.response?.data?['detail'] ?? dioError.message;
-        throw Exception("Ошибка инициализации на сервере: $errorMessage");
+        print("Ошибка инициализации на сервере: $errorMessage");
+        rethrow;
       }
       await firebaseUser.getIdToken(true);
 
@@ -65,7 +66,8 @@ class AuthRepository {
 
       return newUser;
     } on firebase.FirebaseAuthException catch (e) {
-      throw Exception('Ошибка регистрации: ${e.message}');
+      print('Ошибка при регистрации.');
+      rethrow;
     } catch (e) {
       rethrow;
     }
@@ -86,7 +88,8 @@ class AuthRepository {
 
       return await _fetchUserFromFirestore(firebaseUser);
     } on firebase.FirebaseAuthException catch (e) {
-      throw Exception('Ошибка входа: ${e.message}');
+      print('Ошибка входа: ${e.message}');
+      rethrow;
     } catch (e) {
       print(
         'Непредвиденная ошибка во время входа: ${e.toString()}',
@@ -120,6 +123,7 @@ class AuthRepository {
       }
     } catch (e) {
       print('Ошибка чтения из Firestore: $e'); //todo изменить на логирование
+      rethrow;
     }
 
     return UserModel(
