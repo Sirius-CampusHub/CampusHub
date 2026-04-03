@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:client/domain/model/model.dart';
 import 'package:client/data/source/source.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
+
 
 class AuthRepository {
   final FirebaseAuthDataSource _authDataSource;
