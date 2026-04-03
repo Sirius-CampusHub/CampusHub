@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:client/domain/model/model.dart';
 
 class AuthRepository {
+
+  final Dio _dio;
+  AuthRepository({required Dio dio}) : _dio = dio;
+
   final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Dio _dio = Dio(); 
 
   Stream<UserModel?> get userStream {
     return _auth.authStateChanges().asyncMap((firebaseUser) async {

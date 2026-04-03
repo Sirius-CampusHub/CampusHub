@@ -33,9 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (_isLogin) {
-      context.read<AppBloc>().add(AuthSignInRequested(email: email, password: password));
+      context.read<AuthBloc>().add(AuthSignInRequested(email: email, password: password));
     } else {
-      context.read<AppBloc>().add(AuthSignUpRequested(email: email, password: password));
+      context.read<AuthBloc>().add(AuthSignUpRequested(email: email, password: password));
     }
   }
 
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: BlocConsumer<AppBloc, AuthState>(
+          child: BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state)  {
               // Syncing _error with error from BLoC
               if (state is AuthError) {

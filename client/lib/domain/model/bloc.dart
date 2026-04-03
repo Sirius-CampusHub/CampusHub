@@ -1,5 +1,4 @@
 // Models imports
-import 'package:client/core/dependencies.dart';
 import 'package:client/domain/model/model.dart';
 
 import 'auth_state.dart';
@@ -11,15 +10,12 @@ import 'package:bloc/bloc.dart';
 // Repos imports
 import 'package:client/data/repository/auth_repository.dart';
 
-class AppBloc extends Bloc<AuthEvent, AuthState> {
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
-  final Dependencies _dependencies;
 
-  AppBloc({
+  AuthBloc({
     required AuthRepository authRepository,
-    required Dependencies dependencies,
   }) : _authRepository = authRepository,
-       _dependencies = dependencies,
        super(AuthInitial()) {
     on<AuthSignInRequested>(_onSignIn);
     on<AuthSignUpRequested>(_onSignUp);
