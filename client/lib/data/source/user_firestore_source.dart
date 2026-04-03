@@ -4,7 +4,7 @@ import 'package:client/domain/model/model.dart';
 class UserFirestoreDataSource {
   final FirebaseFirestore _firestore;
 
-  UserFirestoreDataSource({FirebaseFirestore firestore}) 
+  UserFirestoreDataSource({required FirebaseFirestore firestore})
       : _firestore = firestore;
 
   Future<void> saveUser(UserModel user) async {
