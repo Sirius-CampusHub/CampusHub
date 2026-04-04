@@ -1,7 +1,7 @@
 ﻿from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth, firestore
-from sqlalchemy import update
+from sqlalchemy import update, insert
 
 from auth.PromoteRequest import PromoteRequest
 from database.models import User as DBUser
