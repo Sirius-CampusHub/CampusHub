@@ -51,8 +51,8 @@ class AuthRepository {
       
       await _authDataSource.getToken(forceRefresh: true);
 
-      //String? token = await _authDataSource.getToken(forceRefresh: true);
-      //print("Bearer "+ token.toString());
+      String? token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer "+ token.toString());
 
       final newUser = UserModel(
         id: firebaseUser.uid,
@@ -79,8 +79,8 @@ class AuthRepository {
       final firebaseUser = await _authDataSource.signIn(email: email, password: password);
       var auth = await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
 
-      //String? token = await _authDataSource.getToken(forceRefresh: true);
-      //print("Bearer "+ token.toString());
+      String? token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer "+ token.toString());
 
       return auth;
     } catch (e) {
