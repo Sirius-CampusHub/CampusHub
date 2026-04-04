@@ -51,6 +51,9 @@ class AuthRepository {
       
       await _authDataSource.getToken(forceRefresh: true);
 
+      String? token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer "+ token.toString());
+
       final newUser = UserModel(
         id: firebaseUser.uid,
         email: email,
@@ -74,7 +77,12 @@ class AuthRepository {
   }) async {
     try {
       final firebaseUser = await _authDataSource.signIn(email: email, password: password);
-      return await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
+      var auth = await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
+
+      String? token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer "+ token.toString());
+
+      return auth;
     } catch (e) {
       // TODO: Логирование
       rethrow;
