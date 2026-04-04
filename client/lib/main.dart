@@ -43,7 +43,7 @@ void main() async {
   // Initializing repos
   final authRepository = AuthRepository(dio: dio, authDataSource: authDataSource, firestoreDataSource: userFireStore);
 
-  final newsRepository = NewsRepository(dio: dio);
+  final newsRepository = NewsRepository(dio: dio, authDataSource: authDataSource);
 
   final Dependencies dependencies = Dependencies(authRepository: authRepository, newsRepository: newsRepository);
 

@@ -1,18 +1,31 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:client/domain/model/model.dart';
+import 'package:client/data/source/source.dart';
 
 class NewsRepository {
+  final FirebaseAuthDataSource _authDataSource;
   final Dio _dio;
 
   //TODO ВЫНЕСТИ
   static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/news';
 
-  NewsRepository({required Dio dio}) : _dio = dio;
+  NewsRepository({
+    required Dio dio,
+    required FirebaseAuthDataSource authDataSource,
+  }) : _dio = dio, _authDataSource = authDataSource;
 
   Future<List<NewsModel>> getAllNews() async {
     try {
-      final response = await _dio.get('$_baseUrl/');
+      final rawToken = await _authDataSource.getToken();
+
+      final response = await _dio.get('$_baseUrl/',
+        options: Options(
+        headers: {
+          'Authorization': 'Bearer $rawToken',
+        },
+        ),
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
