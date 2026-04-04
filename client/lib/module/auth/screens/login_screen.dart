@@ -1,6 +1,6 @@
-import 'package:client/domain/model/auth_event.dart';
-import 'package:client/domain/model/auth_state.dart';
-import 'package:client/domain/model/bloc.dart';
+import 'package:client/domain/bloc/auth_event.dart';
+import 'package:client/domain/bloc/auth_state.dart';
+import 'package:client/domain/bloc/auth_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;

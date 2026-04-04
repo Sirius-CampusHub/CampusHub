@@ -1,7 +1,7 @@
 // Models
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
-import 'package:client/domain/model/bloc.dart';
+import 'package:client/domain/bloc/auth_bloc.dart';
 import 'core/dependencies.dart';
 import 'network/http_client.dart';
 
