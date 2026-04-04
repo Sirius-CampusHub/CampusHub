@@ -1,22 +1,26 @@
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:client/domain/model/model.dart';
+import 'package:client/data/source/source.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
+
 
 class AuthRepository {
-
+  final FirebaseAuthDataSource _authDataSource;
+  final UserFirestoreDataSource _firestoreDataSource;
   final Dio _dio;
-  AuthRepository({required Dio dio}) : _dio = dio;
 
-  final firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  AuthRepository({
+    required FirebaseAuthDataSource authDataSource,
+    required UserFirestoreDataSource firestoreDataSource,
+    required Dio dio,
+  })  : _authDataSource = authDataSource,
+        _firestoreDataSource = firestoreDataSource,
+        _dio = dio;
 
   Stream<UserModel?> get userStream {
-    return _auth.authStateChanges().asyncMap((firebaseUser) async {
-      if (firebaseUser == null) {
-        return null;
-      }
-      return await _fetchUserFromFirestore(firebaseUser);
+    return _authDataSource.authStateChanges.asyncMap((firebaseUser) async {
+      if (firebaseUser == null) return null;
+      return await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
     });
   }
 
@@ -25,17 +29,11 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final firebaseUser = credential.user;
-      if (firebaseUser == null) throw Exception("Ошибка создания пользователя");
-
-      final rawToken = await firebaseUser.getIdToken();
+      final firebaseUser = await _authDataSource.signUp(email: email, password: password);
+      final rawToken = await _authDataSource.getToken();
 
       try {
+        // TODO: ВЫНЕСТИ ССЫЛКУ в константы / env
         await _dio.post(
           'https://siriusapi.kod.polytech-schedule.ru/auth/init',
           options: Options(
@@ -45,28 +43,30 @@ class AuthRepository {
           ),
         );
       } on DioException catch (dioError) {
-        await firebaseUser.delete();
-        
+        await _authDataSource.deleteCurrentUser();
         final errorMessage = dioError.response?.data?['detail'] ?? dioError.message;
-        throw Exception("Ошибка инициализации на сервере: $errorMessage");
+        print("Ошибка инициализации на сервере: $errorMessage");
+        rethrow;
       }
-      await firebaseUser.getIdToken(true);
+      
+      await _authDataSource.getToken(forceRefresh: true);
+
+      //String? token = await _authDataSource.getToken(forceRefresh: true);
+      //print("Bearer "+ token.toString());
 
       final newUser = UserModel(
         id: firebaseUser.uid,
         email: email,
         role: UserRole.student,
       );
-
-      await _firestore
-          .collection('users')
-          .doc(newUser.id)
-          .set(newUser.toFirestore());
+      await _firestoreDataSource.saveUser(newUser);
 
       return newUser;
     } on firebase.FirebaseAuthException catch (e) {
-      throw Exception('Ошибка регистрации: ${e.message}');
+      print('Ошибка при регистрации.');
+      rethrow;
     } catch (e) {
+      // TODO: Логирование
       rethrow;
     }
   }
@@ -76,55 +76,33 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      final credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final firebaseUser = await _authDataSource.signIn(email: email, password: password);
+      var auth = await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
 
-      final firebaseUser = credential.user;
-      if (firebaseUser == null) throw Exception("Пользователь не найден");
+      //String? token = await _authDataSource.getToken(forceRefresh: true);
+      //print("Bearer "+ token.toString());
 
-      return await _fetchUserFromFirestore(firebaseUser);
-    } on firebase.FirebaseAuthException catch (e) {
-      throw Exception('Ошибка входа: ${e.message}');
+      return auth;
     } catch (e) {
-      print(
-        'Непредвиденная ошибка во время входа: ${e.toString()}',
-      ); // TODO переделать на логирование
+      // TODO: Логирование
       rethrow;
     }
   }
 
-  Future<String?> getToken() async {
-    final firebaseUser = _auth.currentUser;
-    try {
-      return await firebaseUser?.getIdToken();
-    } catch (e) {
-      rethrow; // TODO add logging
-    }
-  }
-
   Future<void> signOut() async {
-    await _auth.signOut();
+    await _authDataSource.signOut();
   }
 
-  Future<UserModel> _fetchUserFromFirestore(firebase.User firebaseUser) async {
-    try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .get();
-
-      if (doc.exists && doc.data() != null) {
-        return UserModel.fromFirestore(doc.id, doc.data()!);
-      }
-    } catch (e) {
-      print('Ошибка чтения из Firestore: $e'); //todo изменить на логирование
+  Future<UserModel> _fetchUserOrCreateDefault(String uid, String? email) async {
+    final userModel = await _firestoreDataSource.getUser(uid);
+    
+    if (userModel != null) {
+      return userModel;
     }
 
     return UserModel(
-      id: firebaseUser.uid,
-      email: firebaseUser.email ?? '',
+      id: uid,
+      email: email ?? '',
       role: UserRole.student,
     );
   }
