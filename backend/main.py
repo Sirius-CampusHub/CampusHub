@@ -1,17 +1,17 @@
 from contextlib import asynccontextmanager
 import fastapi
-from fastapi.staticfiles import StaticFiles # Импорт для раздачи файлов
+from fastapi.staticfiles import StaticFiles
 from schedule import router
-from auth import auth_routes
 import os
 import json
 import base64
-import firebase_admin
-from firebase_admin import credentials
 from dotenv import load_dotenv
 from database.database import engine, Base
 
 load_dotenv()
+
+import firebase_admin
+from firebase_admin import credentials
 
 def init_firebase():
     base64_config = os.getenv("FIREBASE_CONFIG_BASE64")
