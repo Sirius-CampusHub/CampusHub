@@ -27,7 +27,7 @@ class NewsModel {
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
-      imageUrl: json['image_url'] as String?,
+      imageUrl: _baseUrl + json['image_url'] as String?,
       authorId: json['author_id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );

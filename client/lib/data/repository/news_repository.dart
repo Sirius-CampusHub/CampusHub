@@ -18,8 +18,8 @@ class NewsRepository {
   Future<List<NewsModel>> getAllNews() async {
     try {
       final rawToken = await _authDataSource.getToken();
-
-      final response = await _dio.get('$_baseUrl/',
+      final response = await _dio.get(
+        '$_baseUrl/',
         options: Options(
         headers: {
           'Authorization': 'Bearer $rawToken',
@@ -44,6 +44,7 @@ class NewsRepository {
     File? imageFile,
   }) async {
     try {
+      final rawToken = await _authDataSource.getToken();
       final formData = FormData.fromMap({
         "title": title,
         "content": content,
@@ -62,6 +63,11 @@ class NewsRepository {
       final response = await _dio.post(
         '$_baseUrl/',
         data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $rawToken',
+          },
+        ),
       );
 
       return NewsModel.fromJson(response.data);
@@ -79,7 +85,16 @@ class NewsRepository {
 
   Future<void> deleteNews(String newsId) async {
     try {
-      await _dio.delete('$_baseUrl/$newsId');
+      final rawToken = await _authDataSource.getToken();
+
+      await _dio.delete(
+          '$_baseUrl/$newsId',
+            options: Options(
+              headers: {
+              'Authorization': 'Bearer $rawToken',
+            },
+        ),
+      );
     } on DioException catch (e) {
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Только студсовет может удалять новости.");
