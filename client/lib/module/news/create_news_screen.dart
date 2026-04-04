@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:client/domain/model/news/news_bloc.dart';
-import 'package:client/domain/model/news/news_event.dart';
-import 'package:client/domain/model/news/news_state.dart';
+
+import '../../domain/news/news_bloc.dart';
+import '../../domain/news/news_event.dart';
+import '../../domain/news/news_state.dart';
 
 class CreateNewsScreen extends StatefulWidget {
   const CreateNewsScreen({super.key});

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:client/domain/model/news/news_bloc.dart';
 import 'package:client/domain/model/user_role.dart';
 import 'package:client/domain/model/bloc.dart';
 import 'package:client/domain/model/auth_state.dart';
-import '../../domain/model/news/news_event.dart';
-import '../../domain/model/news/news_state.dart';
+import '../../domain/news/news_bloc.dart';
+import '../../domain/news/news_event.dart';
+import '../../domain/news/news_state.dart';
 import 'create_news_screen.dart';
 
 class NewsScreen extends StatefulWidget {

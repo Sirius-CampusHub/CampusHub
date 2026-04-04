@@ -3,7 +3,7 @@ import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
 import 'package:client/domain/model/bloc.dart';
 import 'core/dependencies.dart';
-import 'domain/model/news/news_bloc.dart';
+import 'domain/news/news_bloc.dart';
 import 'network/http_client.dart';
 
 // Internal packages
