@@ -54,9 +54,9 @@ class _NewsScreenState extends State<NewsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (news.imageUrl != null && news.imageUrl!.isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: news.imageUrl!,
+                        if (news.fullImageUrl != null && news.fullImageUrl!.isNotEmpty)
+                          CachedNetworkImage(
+                          imageUrl: news.fullImageUrl!,
                           width: double.infinity,
                           fit: BoxFit.fitWidth,
                           placeholder: (context, url) => const AspectRatio(
