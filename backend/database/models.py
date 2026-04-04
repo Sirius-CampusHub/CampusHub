@@ -4,6 +4,12 @@ import uuid
 from .database import Base
 import enum
 
+USER_AVATAR_EMOJI_MAX_LEN = 16
+USER_DISPLAY_NAME_MAX_LEN = 18
+USER_BIO_MAX_LEN = 200
+USER_TELEGRAM_HANDLE_MAX_LEN = 25
+USER_GROUP_CODE_MAX_LEN = 10
+
 
 def _utc_now_naive() -> datetime:
     """UTC wall time without tzinfo — matches PostgreSQL TIMESTAMP WITHOUT TIME ZONE + asyncpg."""
@@ -32,3 +38,10 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     role = Column(String, default="student")
     created_at = Column(DateTime, default=_utc_now_naive)
+
+    avatar_emoji = Column(String(USER_AVATAR_EMOJI_MAX_LEN), nullable=True)
+    display_name = Column(String(USER_DISPLAY_NAME_MAX_LEN), nullable=True)
+    group_code = Column(String(USER_GROUP_CODE_MAX_LEN), nullable=True)
+    bio = Column(String(USER_BIO_MAX_LEN), nullable=True)
+    telegram_handle = Column(String(USER_TELEGRAM_HANDLE_MAX_LEN), nullable=True)
+    username = Column(String(64), nullable=True, unique=True, index=True)
