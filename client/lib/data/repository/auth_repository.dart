@@ -48,8 +48,11 @@ class AuthRepository {
         print("Ошибка инициализации на сервере: $errorMessage");
         rethrow;
       }
-
+      
       await _authDataSource.getToken(forceRefresh: true);
+
+      //String? token = await _authDataSource.getToken(forceRefresh: true);
+      //print("Bearer "+ token.toString());
 
       final newUser = UserModel(
         id: firebaseUser.uid,
@@ -76,11 +79,10 @@ class AuthRepository {
       final firebaseUser = await _authDataSource.signIn(email: email, password: password);
       var auth = await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
 
-      String? token = await _authDataSource.getToken();
-      print("Bearer "+ token.toString());
+      //String? token = await _authDataSource.getToken(forceRefresh: true);
+      //print("Bearer "+ token.toString());
 
       return auth;
-
     } catch (e) {
       // TODO: Логирование
       rethrow;
@@ -93,7 +95,7 @@ class AuthRepository {
 
   Future<UserModel> _fetchUserOrCreateDefault(String uid, String? email) async {
     final userModel = await _firestoreDataSource.getUser(uid);
-
+    
     if (userModel != null) {
       return userModel;
     }

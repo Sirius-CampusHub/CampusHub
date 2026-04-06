@@ -49,8 +49,8 @@ class _NewsScreenState extends State<NewsScreen> {
                   surfaceTintColor: Colors.transparent,
                   clipBehavior: Clip.antiAlias,
                   child: GestureDetector(
-                    // onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
-                    onLongPress: () => _confirmDelete(context, news.id),
+                    onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
+                    // onLongPress: () => _confirmDelete(context, news.id),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
