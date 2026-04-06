@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
+import 'package:client/core/dependencies.dart';
+import 'package:client/domain/bloc/auth_bloc.dart';
+import 'package:client/domain/bloc/auth_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../app_shell.dart';
 import 'login_screen.dart';
+import 'registration_profile_screen.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -17,12 +23,36 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.hasData) {
-          return const AppShell();
+        final firebaseUser = snapshot.data;
+        if (firebaseUser == null) {
+          return const LoginScreen();
         }
 
-        // return const AppShell();
-        return const LoginScreen();
+        return BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthAuthenticated) {
+              return const AppShell();
+            }
+            if (state is AuthAwaitingProfileCompletion) {
+              return const RegistrationProfileScreen();
+            }
+            return FutureBuilder<bool>(
+              future: context.dependencies.authRepository
+                  .shouldShowRegistrationForUid(firebaseUser.uid),
+              builder: (context, pendingSnap) {
+                if (pendingSnap.connectionState != ConnectionState.done) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (pendingSnap.data == true) {
+                  return const RegistrationProfileScreen();
+                }
+                return const AppShell();
+              },
+            );
+          },
+        );
       },
     );
   }

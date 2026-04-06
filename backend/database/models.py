@@ -44,4 +44,3 @@ class User(Base):
     group_code = Column(String(USER_GROUP_CODE_MAX_LEN), nullable=True)
     bio = Column(String(USER_BIO_MAX_LEN), nullable=True)
     telegram_handle = Column(String(USER_TELEGRAM_HANDLE_MAX_LEN), nullable=True)
-    username = Column(String(64), nullable=True, unique=True, index=True)

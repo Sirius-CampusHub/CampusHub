@@ -22,8 +22,6 @@ router = APIRouter(
     tags=["Profile"],
 )
 
-_USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,64}$")
-
 
 class ProfileResponse(BaseModel):
     id: str
@@ -34,7 +32,6 @@ class ProfileResponse(BaseModel):
     group_code: str | None
     bio: str | None
     telegram_handle: str | None
-    username: str | None
     created_at: datetime.datetime
 
     class Config:
@@ -51,7 +48,6 @@ class PublicProfileResponse(BaseModel):
     group_code: str | None
     bio: str | None
     telegram_handle: str | None
-    username: str | None
     created_at: datetime.datetime
 
     class Config:
@@ -65,21 +61,6 @@ class ProfileUpdateBody(BaseModel):
     telegram_handle: str | None = Field(
         default=None, max_length=USER_TELEGRAM_HANDLE_MAX_LEN
     )
-    username: str | None = None
-
-    @field_validator("username")
-    @classmethod
-    def username_format(cls, v: str | None) -> str | None:
-        if v is None or v == "":
-            return None
-        v = v.strip()
-        if v.startswith("@"):
-            v = v[1:]
-        if not _USERNAME_RE.match(v):
-            raise ValueError(
-                "username: 3–64 символа, латиница, цифры и подчёркивание"
-            )
-        return v
 
     @field_validator("group_code")
     @classmethod
@@ -176,19 +157,6 @@ async def update_profile(
         )
 
     data = body.model_dump(exclude_unset=True)
-
-    if "username" in data and data["username"] is not None:
-        conflict = await db.execute(
-            select(DBUser.id).where(
-                DBUser.username == data["username"],
-                DBUser.id != uid,
-            )
-        )
-        if conflict.first() is not None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Этот username уже занят.",
-            )
 
     for key, value in data.items():
         setattr(row, key, value)
