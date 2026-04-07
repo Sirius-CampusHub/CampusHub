@@ -60,7 +60,7 @@ class ForumScreen extends StatelessWidget {
 }
 
 class _CreateTopicForm extends StatefulWidget {
-  final Function(String title, String description) onSubmit;
+  final void Function(String title, String description) onSubmit;
 
   const _CreateTopicForm({required this.onSubmit});
 

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:client/domain/model/topic_model.dart';
 
 class ForumRepository {

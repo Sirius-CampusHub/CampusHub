@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:client/domain/model/comment_model.dart';
 
 class TopicRepository {
@@ -7,26 +6,28 @@ class TopicRepository {
     const CommentModel(
         id: '1',
         author: 'Daniel',
-        content: 'first comment!'
+        content: 'first comment!',
+        topicId: '1',
     ),
     const CommentModel(
         id: '2',
         author: 'Hleb',
-        content: 'another comment'
+        content: 'another comment',
+        topicId: '1',
     ),
     const CommentModel(
         id: '3',
         author: 'Varya',
-        content: 'yet another comment'
+        content: 'yet another comment',
+        topicId: '2',
     ),
   ];
 
   Future<List<CommentModel>> getComments(String topicId) async {
-    print(["Loading topic with topicId: ", topicId]);
-    return List.from(_mockComments);
+    return List.from(_mockComments.where((x) => x.topicId == topicId));
   }
 
-  Future<void> createComment(String content) async {
+  Future<void> createComment(String content, String topicId) async {
 
     // В будущем здесь будет реальный POST-запрос на эндпоинт
     _mockComments.insert(
@@ -34,7 +35,8 @@ class TopicRepository {
       CommentModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           author: 'Текущий Пользователь',
-          content: content
+          content: content,
+          topicId: topicId,
       )
     );
   }

@@ -41,7 +41,7 @@ class TopicScreen extends StatelessWidget {
 }
 
 class _CommentInputField extends StatefulWidget {
-  final Function(String content) onSubmit;
+  final void Function(String content) onSubmit;
 
   const _CommentInputField({required this.onSubmit});
 
