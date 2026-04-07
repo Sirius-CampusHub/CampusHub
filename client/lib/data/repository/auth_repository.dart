@@ -1,3 +1,5 @@
+import 'package:client/core/api_config.dart';
+import 'package:client/domain/model/profile_model.dart';
 import 'package:dio/dio.dart';
 import 'package:client/data/local/registration_draft_storage.dart';
 import 'package:client/domain/model/model.dart';
@@ -153,7 +155,7 @@ class AuthRepository {
     return null;
   }
 
-  Future<UserModel> signIn({
+  Future<ProfileModel> signIn({
     required String email,
     required String password,
   }) async {
@@ -164,10 +166,11 @@ class AuthRepository {
       firebaseUser.email,
     );
 
+    final model = await getProfileData();
+    final authModel = ProfileModel(registrationProfileData: model, userModel: auth);
+    return authModel;
       //String? token = await _authDataSource.getToken(forceRefresh: true);
       //print("Bearer "+ token.toString());
-
-    return auth;
   }
 
   Future<void> signOut() async {
@@ -181,6 +184,40 @@ class AuthRepository {
       // требуется недавний вход и т.п. — всё равно чистим сессию
     }
     await _authDataSource.signOut();
+  }
+
+  Future<RegistrationProfileData> getProfileData() async {
+    if (await hasCompletedBackendProfile()) {
+      final token = await _authDataSource.getToken(forceRefresh: true);
+
+      try {
+        final response = await _dio.get(
+          'profile/me',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+        );
+
+        final data = response.data;
+
+        // TODO убрать
+        print(data);
+        if (data is! Map<String, dynamic>) {
+          throw Exception(
+              'Неправильный формат response при логине.');
+        }
+
+        final model = RegistrationProfileData.fromJson(data);
+        return model;
+      } on DioException catch (e) {
+        print(e);
+        rethrow;
+      } catch (e) {
+        rethrow;
+      }
+    } else {
+      throw Exception('Не получилось войти в аккаунт');
+    }
   }
 
   Future<bool> hasCompletedBackendProfile() async {
@@ -203,11 +240,14 @@ class AuthRepository {
       return (displayName != null && displayName.isNotEmpty) &&
           (avatarEmoji != null && avatarEmoji.isNotEmpty);
     } on DioException catch (e) {
+      print(e.message);
       if (e.response?.statusCode == 404) {
         return false;
       }
-      // Сетевые/временные ошибки не должны ломать вход.
-      return true;
+      return false;
+    } catch (e) {
+      print(e.toString());
+      return false;
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:client/domain/model/model.dart';
+import 'package:client/domain/model/profile_model.dart';
 
 // States of authentification for BLoC
 abstract class AuthState {}
@@ -13,8 +14,8 @@ class AuthLoading extends AuthState {}
 class AuthAwaitingProfileCompletion extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
-  final UserModel user;
-  AuthAuthenticated({required this.user});
+  final ProfileModel profileModel;
+  AuthAuthenticated({required this.profileModel});
 }
 
 class AuthError extends AuthState {

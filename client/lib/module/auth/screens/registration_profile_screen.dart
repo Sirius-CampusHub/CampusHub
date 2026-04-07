@@ -22,9 +22,9 @@ class RegistrationProfileScreen extends StatefulWidget {
 
 class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   static const int _maxDisplayName = 30;
-  static const int _maxGroupCode = 10;
+  static const int _maxGroupCode = 20;
   static const int _maxBio = 200;
-  static const int _maxTelegram = 25;
+  static const int _maxTelegram = 33;
   static const int _maxAvatarEmoji = 16;
 
   static const String _defaultAvatarEmoji = '😀';

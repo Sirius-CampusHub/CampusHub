@@ -6,7 +6,7 @@ class ScheduleRepository {
 
   ScheduleRepository({required Dio dio}) : _dio = dio;
 
-  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/schedule';
+  static const String _url = 'schedule';
 
   Future<WeekScheduleModel> getSchedule(String group, int weekOffset) async {
     String url = _createLink([group, weekOffset]);
@@ -32,7 +32,7 @@ class ScheduleRepository {
   }
 
   String _createLink(List<Object> args) {
-    String link = _baseUrl + '/?';
+    String link = _url + '/?';
     args.forEach((e) {link += "${e}&";});
     return link;
   }
