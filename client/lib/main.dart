@@ -26,7 +26,7 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  final dio = createAppHttpClient(baseUrl: '${ApiConfig.baseUrl}/');
+  final dio = createAppHttpClient(baseUrl: ApiConfig.baseUrl);
 
   // FireBase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
