@@ -8,12 +8,18 @@ class NewsLoading extends NewsState {}
 
 class NewsLoaded extends NewsState {
   final List<NewsModel> newsList;
+
   NewsLoaded(this.newsList);
 }
 
 class NewsError extends NewsState {
   final String message;
-  NewsError(this.message);
+  final List<NewsModel>? previousNewsList;
+
+  NewsError({
+    required this.message,
+    this.previousNewsList,
+  });
 }
 
 class NewsCreateSuccess extends NewsState {}

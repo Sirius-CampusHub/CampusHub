@@ -2,10 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../domain/news/news_bloc.dart';
-import '../../domain/news/news_event.dart';
-import '../../domain/news/news_state.dart';
+import '../../domain/bloc/news/news_bloc.dart';
+import '../../domain/bloc/news/news_event.dart';
+import '../../domain/bloc/news/news_state.dart';
 
 class CreateNewsScreen extends StatefulWidget {
   const CreateNewsScreen({super.key});
@@ -46,20 +45,6 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
         imageFile: _selectedImage,
       ),
     );
-
-    await BlocListener<NewsBloc, NewsState>(
-      listener: (context, state) {
-        if (state is NewsCreateSuccess) {
-          Navigator.pop(context, true);
-        } else if (state is NewsError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: ${state.message}')),
-          );
-          setState(() => _isLoading = false);
-        }
-      },
-      child: const SizedBox.shrink(),
-    );
   }
 
   @override
@@ -76,89 +61,87 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
         title: const Text('Создание новости'),
         leading: BackButton(),
       ),
-      body: BlocConsumer<NewsBloc, NewsState>(
+      body: BlocListener<NewsBloc, NewsState>(
         listener: (context, state) {
           if (state is NewsCreateSuccess) {
             Navigator.pop(context, true);
           } else if (state is NewsError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Ошибка: ${state.message}')),
+              SnackBar(content: Text(state.message)),
             );
             setState(() => _isLoading = false);
           }
         },
-        builder: (context, state) {
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        width: double.infinity,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade400),
-                        ),
-                        child: _selectedImage != null
-                            ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(_selectedImage!, fit: BoxFit.cover),
-                        )
-                            : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_photo_alternate, size: 48, color: Colors.grey[600]),
-                            const SizedBox(height: 8),
-                            Text('Загрузить фото', style: TextStyle(color: Colors.grey[600])),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Заголовок',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _contentController,
-                      decoration: const InputDecoration(
-                        labelText: 'Текст новости',
-                        border: OutlineInputBorder(),
-                        alignLabelWithHint: true,
-                      ),
-                      maxLines: 10,
-                    ),
-                    const SizedBox(height: 32),
-                    SizedBox(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
                       width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _saveNews,
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : const Text('Сохранить'),
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: _selectedImage != null
+                          ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                      )
+                          : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate, size: 48, color: Colors.grey[600]),
+                          const SizedBox(height: 8),
+                          Text('Загрузить фото', style: TextStyle(color: Colors.grey[600])),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Заголовок',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _contentController,
+                    decoration: const InputDecoration(
+                      labelText: 'Текст новости',
+                      border: OutlineInputBorder(),
+                      alignLabelWithHint: true,
+                    ),
+                    maxLines: 10,
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _saveNews,
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Сохранить'),
+                    ),
+                  ),
+                ],
               ),
-              if (_isLoading)
-                Container(
-                  color: Colors.black54,
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-            ],
-          );
-        },
+            ),
+            if (_isLoading)
+              Container(
+                color: Colors.black54,
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
       ),
     );
   }

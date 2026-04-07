@@ -1,9 +1,9 @@
 // Models
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
-import 'package:client/domain/bloc/auth_bloc.dart';
+import 'package:client/domain/bloc/auth/auth_bloc.dart';
 import 'core/dependencies.dart';
-import 'domain/news/news_bloc.dart';
+import 'domain/bloc/news/news_bloc.dart';
 import 'network/http_client.dart';
 
 // Internal packages

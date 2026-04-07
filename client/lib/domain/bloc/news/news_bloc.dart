@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:client/data/repository/repository.dart';
+import 'package:client/domain/model/news_model.dart';
 import 'news_event.dart';
 import 'news_state.dart';
 
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsRepository _repository;
+  List<NewsModel>? _lastNewsList;
 
   NewsBloc({
     required NewsRepository newsRepository,
@@ -17,10 +19,16 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   Future<void> _onFetchNews(FetchNews event, Emitter<NewsState> emit) async {
     emit(NewsLoading());
     try {
-      final snapshot = await _repository.getAllNews();
-      emit(NewsLoaded(snapshot));
+      final newsList = await _repository.getAllNews();
+      _lastNewsList = newsList;
+      emit(NewsLoaded(newsList));
     } catch (e) {
-      emit(NewsError(e.toString()));
+      emit(
+        NewsError(
+          message: e.toString(),
+          previousNewsList: _lastNewsList,
+        ),
+      );
     }
   }
 
@@ -34,7 +42,12 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       emit(NewsCreateSuccess());
       add(FetchNews());
     } catch (e) {
-      emit(NewsError(e.toString()));
+      emit(
+        NewsError(
+          message: e.toString(),
+          previousNewsList: _lastNewsList,
+        ),
+      );
     }
   }
 
@@ -44,7 +57,12 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       emit(NewsDeleteSuccess());
       add(FetchNews());
     } catch (e) {
-      emit(NewsError(e.toString()));
+      emit(
+        NewsError(
+          message: e.toString(),
+          previousNewsList: _lastNewsList,
+        ),
+      );
     }
   }
 }

@@ -1,10 +1,11 @@
-import 'package:client/domain/bloc/auth_event.dart';
-import 'package:client/domain/bloc/auth_state.dart';
-import 'package:client/domain/bloc/auth_bloc.dart';
+import '../../../domain/bloc/auth/auth_event.dart';
+import '../../../domain/bloc/auth/auth_state.dart';
+import 'package:client/domain/bloc/auth/auth_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
