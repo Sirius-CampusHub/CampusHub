@@ -31,13 +31,13 @@ init_firebase()
 from schedule import routes
 from auth import auth_routes
 from news import news_routes
+from profiles import router as profile_router
 
 os.makedirs("uploads", exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Схема БД управляется миграциями Alembic (см. backend/alembic/).
     yield
 
 app = fastapi.FastAPI(
@@ -50,5 +50,6 @@ app = fastapi.FastAPI(
 app.mount("/static", StaticFiles(directory="uploads"), name="static")
 app.include_router(router)
 app.include_router(auth_routes.router)
+app.include_router(profile_router)
 app.include_router(news_routes.router)
 app.include_router(routes.router)

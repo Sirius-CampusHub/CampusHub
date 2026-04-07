@@ -5,7 +5,7 @@ from sqlalchemy import update
 from sqlalchemy.dialects.postgresql import insert
 
 from auth.PromoteRequest import PromoteRequest
-from database.models import User as DBUser
+from database.models import User as DBUser, USER_DISPLAY_NAME_MAX_LEN
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import get_db
 
@@ -36,6 +36,13 @@ def require_council_role(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Только студсовет может публиковать новости.")
     return user
 
+def _name_from_token(name: object | None) -> str | None:
+    if name is None:
+        return None
+    s = str(name).strip()[:USER_DISPLAY_NAME_MAX_LEN]
+    return s or None
+
+
 @router.post("/init")
 async def init_new_user(
     db: AsyncSession = Depends(get_db),
@@ -43,6 +50,7 @@ async def init_new_user(
 ):
     uid = user_data.get("uid")
     email = user_data.get("email")
+    display_name = _name_from_token(user_data.get("name"))
 
     try:
         auth.set_custom_user_claims(uid, {"role": "student"})
@@ -51,23 +59,23 @@ async def init_new_user(
 
     try:
         stmt = insert(DBUser).values(
-            id=uid, 
-            email=email, 
-            role="student"
+            id=uid,
+            email=email,
+            role="student",
+            display_name=display_name,
         )
-        
+
         stmt = stmt.on_conflict_do_update(
-            index_elements=['id'],
+            index_elements=["id"],
             set_={
                 "email": email,
-                "role": "student"
-            }
+            },
         )
-        
+
         await db.execute(stmt)
         await db.commit()
         return {"status": "ok"}
-        
+
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {e}")

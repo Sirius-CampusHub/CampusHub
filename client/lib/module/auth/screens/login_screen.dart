@@ -36,9 +36,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (_isLogin) {
       context.read<AuthBloc>().add(AuthSignInRequested(email: email, password: password));
-    } else {
-      context.read<AuthBloc>().add(AuthSignUpRequested(email: email, password: password));
+      return;
     }
+
+    setState(() => _error = null);
+    context.read<AuthBloc>().add(
+          AuthSignUpBasicRequested(email: email, password: password),
+        );
   }
 
   String? _getErrorMessage(Exception error) {
@@ -66,14 +70,21 @@ class _LoginScreenState extends State<LoginScreen> {
     } else if (error is DioException) {
       return 'Ошибка соединения.';
     } else {
+      final s = error.toString();
+      if (s.startsWith('Exception: ')) {
+        return s.substring('Exception: '.length);
+      }
       return 'Ошибка ${_isLogin ? "входа" : "регистрации"}.';
     }
   }
 
-  void _switchType(){
+  void _switchType() {
     setState(() {
       _isLogin = !_isLogin;
       _error = null;
+      if (_isLogin) {
+        _passwordRepeatController.clear();
+      }
     });
   }
 
@@ -87,37 +98,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state)  {
-              // Syncing _error with error from BLoC
+            listener: (context, state) {
               if (state is AuthError) {
                 AuthError authError = state;
                 setState(() {
                   _error = _getErrorMessage(authError.error);
                 });
               } else if (_error != null) {
-                _error = null;
+                setState(() => _error = null);
               }
             },
             builder: (context, state) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // TODO switch to logo
                 const Icon(Icons.school, size: 80, color: Colors.blue),
                 const SizedBox(height: 16),
                 Text(
                   'CampHub',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 32),
 
-                // Email field
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -131,7 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Password field
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -145,36 +154,45 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Repeat password field
-                _isLogin ? const SizedBox() : TextField(
-                  controller: _passwordRepeatController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Повторите пароль',
-                    prefixIcon: Icon(Icons.lock_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                if (!_isLogin) ...[
+                  TextField(
+                    controller: _passwordRepeatController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Повторите пароль',
+                      prefixIcon: Icon(Icons.lock_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                // Error display
-                if (_error != null) Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Дальше настроим профиль: имя, аватар и контакты.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                  child: Text(
-                    _error!,
-                    style: TextStyle(color: Colors.red.shade700),
-                  ),
-                ),
-                if (_error != null) const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                ],
 
-                // Login/register button
+                if (_error != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: Colors.red.shade700),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -195,14 +213,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )
                         : Text(
-                            _isLogin ? 'Войти' : 'Зарегистрироваться',
+                            _isLogin ? 'Войти' : 'Продолжить',
                             style: const TextStyle(fontSize: 16),
                           ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Switch auth type button
                 TextButton(
                   onPressed: () => _switchType(),
                   child: Text(

@@ -8,6 +8,7 @@ import 'auth_event.dart';
 import 'package:bloc/bloc.dart';
 
 // Repos imports
+import 'package:client/data/local/registration_draft_storage.dart';
 import 'package:client/data/repository/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -18,7 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) : _authRepository = authRepository,
        super(AuthInitial()) {
     on<AuthSignInRequested>(_onSignIn);
-    on<AuthSignUpRequested>(_onSignUp);
+    on<AuthSignUpBasicRequested>(_onSignUpBasic);
+    on<AuthCompleteRegistrationRequested>(_onCompleteRegistration);
     on<AuthSignOutRequested>(_onSignOut);
     on<AuthSubscriptionRequested>(_onSubscriptionRequest);
   }
@@ -41,19 +43,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onSignUp(
-    AuthSignUpRequested event,
+  Future<void> _onSignUpBasic(
+    AuthSignUpBasicRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
     try {
-      final UserModel user = await _authRepository.signUp(
+      await _authRepository.signUpFirebaseOnly(
         email: event.email,
         password: event.password,
       );
+      final uid = _authRepository.currentFirebaseUid;
+      if (uid == null) {
+        emit(AuthError(error: Exception('Не удалось создать аккаунт')));
+        return;
+      }
+      await RegistrationDraftStorage.setPendingForUid(uid);
+      emit(AuthAwaitingProfileCompletion());
+    } catch (e) {
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
+    }
+  }
+
+  Future<void> _onCompleteRegistration(
+    AuthCompleteRegistrationRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final UserModel user =
+          await _authRepository.completeRegistration(event.profile);
+      await RegistrationDraftStorage.clearAll();
       emit(AuthAuthenticated(user: user));
     } catch (e) {
       print(e.toString());
+      if (!_authRepository.isFirebaseSignedIn) {
+        await RegistrationDraftStorage.clearAll();
+      }
       emit(AuthError(error: e as Exception));
     }
   }
@@ -76,10 +103,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSubscriptionRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit.forEach<UserModel?>(
-      _authRepository.userStream,
-      onData: (data) =>
-          data != null ? AuthAuthenticated(user: data) : AuthUnauthenticated(),
+    await emit.forEach<AuthState>(
+      _authRepository.userStream.asyncMap((user) async {
+        if (user == null) return AuthUnauthenticated();
+        final needsProfileCompletion =
+            await _authRepository.shouldShowRegistrationForUid(user.id);
+        if (needsProfileCompletion) return AuthAwaitingProfileCompletion();
+        return AuthAuthenticated(user: user);
+      }),
+      onData: (state) => state,
       onError: (e, stackTrace) => AuthError(error: e as Exception),
     );
   }

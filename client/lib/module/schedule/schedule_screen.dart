@@ -17,7 +17,7 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   // Local variables
-  late WeekScheduleModel _weekScheduleModel;
+  WeekScheduleModel _weekScheduleModel = WeekScheduleModel(lessonModel: [DayScheduleModel(lessons: [LessonModel(name: 'name', classroom: 'classroom', lessonType: LessonType.exam, endTime: 'endTime', startTime: 'startTime', discipline: 'discipline', numberPair: 1)], date: '134.34', dayWeek: 'Mn', len: 1)], days: 1);
   Map<int, WeekScheduleModel> _history = {};
   int _currentWeek = 0;
 
