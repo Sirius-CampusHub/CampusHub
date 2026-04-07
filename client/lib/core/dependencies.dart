@@ -1,3 +1,5 @@
+import 'package:client/data/repository/auth_repository.dart';
+import 'package:client/data/repository/news_repository.dart';
 import 'package:client/data/repository/repository.dart';
 import 'package:flutter/widgets.dart';
 
@@ -6,10 +8,12 @@ final class Dependencies {
   const Dependencies({
     required this.authRepository,
     required this.newsRepository,
+    required this.scheduleRepository,
   });
 
   final AuthRepository authRepository;
   final NewsRepository newsRepository;
+  final ScheduleRepository scheduleRepository;
 }
 
 class DependenciesScope extends InheritedWidget {

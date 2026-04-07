@@ -1,11 +1,12 @@
 // Models
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
-
 import 'core/api_config.dart';
 import 'core/dependencies.dart';
 import 'domain/bloc/auth/auth_bloc.dart';
+import 'domain/bloc/auth/auth_event.dart';
 import 'domain/bloc/news/news_bloc.dart';
+import 'domain/bloc/schedule/schedule_bloc.dart';
 import 'network/http_client.dart';
 
 // Internal packages
@@ -27,7 +28,7 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  final dio = createAppHttpClient(baseUrl: ApiConfig.baseUrl);
+  final dio = createAppHttpClient();
 
   // FireBase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -42,18 +43,29 @@ void main() async {
   final userFireStore = UserFirestoreDataSource(firestore: fireStore);
 
   // Initializing repos
-  final authRepository = AuthRepository(dio: dio, authDataSource: authDataSource, firestoreDataSource: userFireStore);
+  final authRepository = AuthRepository(
+    dio: dio,
+    authDataSource: authDataSource,
+    firestoreDataSource: userFireStore,
+  );
 
   final newsRepository = NewsRepository(dio: dio, authDataSource: authDataSource);
 
-  final Dependencies dependencies = Dependencies(authRepository: authRepository, newsRepository: newsRepository);
+  final scheduleRepository = ScheduleRepository(dio: dio);
+
+  final Dependencies dependencies = Dependencies(
+    authRepository: authRepository,
+    newsRepository: newsRepository,
+    scheduleRepository: scheduleRepository,
+  );
 
   runApp(
     DependenciesScope(
       dependencies: dependencies,
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository))..add(AuthSubscriptionRequested()),
+          BlocProvider(create: (_) => ScheduleBloc(scheduleRepository: dependencies.scheduleRepository)),
+          BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository)..add(AuthSubscriptionRequested())),
           BlocProvider(create: (_) => NewsBloc(newsRepository: dependencies.newsRepository)),
         ],
         child: MyApp(),

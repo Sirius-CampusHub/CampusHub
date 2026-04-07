@@ -1,12 +1,10 @@
 import 'package:client/core/dependencies.dart';
+import 'package:client/domain/bloc/auth/auth_bloc.dart';
+import 'package:client/domain/bloc/auth/auth_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/bloc/auth/auth_bloc.daimport '../../../domain/bloc/auth/auth_state.dart';
-rt';
-import '../../../domain/bloc/auth/auth_bloc.dart';
-import '../../../domain/bloc/auth/auth_state.dart';
 import '../../app_shell.dart';
 import 'login_screen.dart';
 import 'registration_profile_screen.dart';
@@ -39,7 +37,7 @@ class AuthGate extends StatelessWidget {
               return const RegistrationProfileScreen();
             }
             return FutureBuilder<bool>(
-              future: () => context.dependencies.authRepository
+              future: context.dependencies.authRepository
                   .shouldShowRegistrationForUid(firebaseUser.uid),
               builder: (context, pendingSnap) {
                 if (pendingSnap.connectionState != ConnectionState.done) {
