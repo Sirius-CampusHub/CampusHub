@@ -17,11 +17,16 @@ class _AppShellState extends State<AppShell> {
 
   static const _titles = ['Профиль', 'Новости', 'Форум', 'Расписание'];
 
-  static const _pages = <Widget>[
-    ProfileScreen(),
-    NewsScreen(),
-    ForumScreen(),
-    ScheduleScreen(),
+  List<Widget> get _pages => [
+    const ProfileScreen(),
+    const NewsScreen(),
+    Navigator(
+      key: const ValueKey('forum_navigator'),
+      onGenerateRoute: (settings) => MaterialPageRoute(
+        builder: (context) => const ForumScreen(),
+      ),
+    ),
+    const ScheduleScreen(),
   ];
 
   @override
