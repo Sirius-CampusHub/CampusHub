@@ -1,7 +1,8 @@
 // Models
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
-import 'package:client/domain/bloc/auth_bloc.dart';
+import 'package:client/domain/bloc/auth/auth_bloc.dart';
+import 'package:client/domain/bloc/schedule/schedule_bloc.dart';
 import 'core/dependencies.dart';
 import 'network/http_client.dart';
 
@@ -19,7 +20,6 @@ import 'module/auth/screens/auth_gate.dart';
 
 // Utils
 import 'utils/firebase_options.dart';
-
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -40,25 +40,37 @@ void main() async {
   final userFireStore = UserFirestoreDataSource(firestore: fireStore);
 
   // Initializing repos
-  final authRepository = AuthRepository(dio: dio, authDataSource: authDataSource, firestoreDataSource: userFireStore);
+  final authRepository = AuthRepository(
+    dio: dio,
+    authDataSource: authDataSource,
+    firestoreDataSource: userFireStore,
+  );
 
   final newsRepository = NewsRepository(dio: dio);
 
-  final Dependencies dependencies = Dependencies(authRepository: authRepository, newsRepository: newsRepository);
+  final scheduleRepository = ScheduleRepository(dio: dio);
+
+  final Dependencies dependencies = Dependencies(
+    authRepository: authRepository,
+    newsRepository: newsRepository,
+    scheduleRepository: scheduleRepository,
+  );
 
   runApp(
     DependenciesScope(
       dependencies: dependencies,
       child: BlocProvider(
         create: (_) =>
-            AuthBloc(authRepository: dependencies.authRepository),
-        child: MyApp(),
+            ScheduleBloc(scheduleRepository: dependencies.scheduleRepository),
+        child: BlocProvider(
+          create: (_) => AuthBloc(authRepository: dependencies.authRepository),
+          child: MyApp(),
+        ),
       ),
     ),
   );
 
   FlutterNativeSplash.remove();
-
 }
 
 class MyApp extends StatelessWidget {
