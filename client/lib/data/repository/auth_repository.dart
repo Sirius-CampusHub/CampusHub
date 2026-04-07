@@ -40,7 +40,7 @@ class AuthRepository {
   Future<UserModel> completeRegistration(RegistrationProfileData profile) async {
     try {
       final email = _authDataSource.currentUser?.email ?? '';
-      await _authDataSource.setUserDisplayName(profile.displayName.trim());
+      await _authDataSource.setUserDisplayName(profile.displayName == null ? '' : profile.displayName!.trim());
 
       final rawToken = await _authDataSource.getToken(forceRefresh: true);
       if (rawToken == null) {
@@ -77,7 +77,7 @@ class AuthRepository {
       try {
         await _dio.patch(
           'profile/avatar',
-          data: {'avatar_emoji': profile.avatarEmoji.trim()},
+          data: {'avatar_emoji': profile.avatarEmoji != null ? profile.avatarEmoji!.trim() : '😀'},
           options: authOptions,
         );
       } on DioException catch (dioError) {
@@ -101,7 +101,7 @@ class AuthRepository {
         id: uid,
         email: email,
         role: UserRole.student,
-        name: profile.displayName.trim(),
+        name: profile.displayName == null ? '' : profile.displayName!.trim(),
       );
       await _firestoreDataSource.saveUser(newUser);
 
@@ -116,7 +116,7 @@ class AuthRepository {
   }
 
   Map<String, dynamic> _profileUpdateJson(RegistrationProfileData p) {
-    final displayName = p.displayName.trim();
+    final displayName = p.displayName == null ? '' : p.displayName!.trim();
     final map = <String, dynamic>{
       'display_name': displayName,
     };

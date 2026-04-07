@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:client/core/dependencies.dart';
 import 'package:client/data/local/emoji.dart';
 import 'package:client/data/local/registration_draft_storage.dart';
-import 'package:client/domain/bloc/auth_bloc.dart';
-import 'package:client/domain/bloc/auth_event.dart';
-import 'package:client/domain/bloc/auth_state.dart';
+import 'package:client/domain/bloc/auth/auth_bloc.dart';
+import 'package:client/domain/bloc/auth/auth_event.dart';
+import 'package:client/domain/bloc/auth/auth_state.dart';
 import 'package:client/domain/model/model.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
@@ -52,10 +52,8 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
     final draft = await RegistrationDraftStorage.loadDraft();
     if (!mounted || draft == null) return;
     setState(() {
-      _selectedAvatarEmoji = draft.avatarEmoji.isNotEmpty
-          ? draft.avatarEmoji
-          : _defaultAvatarEmoji;
-      _displayNameController.text = draft.displayName;
+      _selectedAvatarEmoji = draft.avatarEmoji ?? _defaultAvatarEmoji;
+      _displayNameController.text = draft.displayName ?? '';
       _groupCodeController.text = draft.groupCode ?? '';
       _telegramController.text = draft.telegramHandle ?? '';
       _bioController.text = draft.bio ?? '';
