@@ -24,15 +24,17 @@ class _NewsScreenState extends State<NewsScreen> {
     context.read<NewsBloc>().add(FetchNews());
   }
 
-
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';  }
+    final utc = date.isUtc ? date : DateTime.utc(date.year, date.month, date.day, date.hour, date.minute, date.second);
+    final local = utc.toLocal();
+    return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';  }
 
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.select((AuthBloc bloc) {
       final state = bloc.state;
-      return state is AuthAuthenticated && state.user.role == UserRole.council;
+      // print("ROLE ${ state.user.role == UserRole.council}");
+      return  state.user.role == UserRole.council;
     });
 
     return Scaffold(
@@ -147,7 +149,7 @@ class _NewsScreenState extends State<NewsScreen> {
             );
             if (created == true) {
               if(mounted){
-                context.read<NewsBloc>().add(FetchNews()); // как-то плохо
+                context.read<NewsBloc>().add(FetchNews());
               }
             }
           },
@@ -175,7 +177,5 @@ class _NewsScreenState extends State<NewsScreen> {
       ),
     );
   }
-
-
 }
 
