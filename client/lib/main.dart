@@ -2,12 +2,13 @@
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
 import 'package:client/domain/bloc/auth_bloc.dart';
+import 'package:client/domain/bloc/auth_event.dart';
+import 'core/api_config.dart';
 import 'core/dependencies.dart';
 import 'network/http_client.dart';
 
 // Internal packages
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,7 +26,7 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  Dio dio = createAppHttpClient();
+  final dio = createAppHttpClient(baseUrl: ApiConfig.baseUrl);
 
   // FireBase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -50,8 +51,9 @@ void main() async {
     DependenciesScope(
       dependencies: dependencies,
       child: BlocProvider(
-        create: (_) =>
-            AuthBloc(authRepository: dependencies.authRepository),
+        create: (_) => AuthBloc(
+          authRepository: dependencies.authRepository,
+        )..add(AuthSubscriptionRequested()),
         child: MyApp(),
       ),
     ),
