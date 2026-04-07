@@ -85,6 +85,8 @@ class _NewsScreenState extends State<NewsScreen> {
             return const Center(child: Text('Нет новостей'));
           }
 
+
+
           return ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -122,35 +124,31 @@ class _NewsScreenState extends State<NewsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    news.title,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  _formatDate(news.createdAt),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              news.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
+
                             const SizedBox(height: 8),
                             Text(
                               news.content,
+                              textAlign: TextAlign.justify,
                               style: const TextStyle(fontSize: 15),
-                              maxLines: 8,
-                              overflow: TextOverflow.ellipsis,
                             ),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                _formatDate(news.createdAt),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),

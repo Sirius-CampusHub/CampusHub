@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../domain/bloc/news/news_bloc.dart';
@@ -106,6 +107,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                   const SizedBox(height: 24),
                   TextField(
                     controller: _titleController,
+                    maxLines: 1,
+                    maxLength: 100,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     decoration: const InputDecoration(
                       labelText: 'Заголовок',
                       border: OutlineInputBorder(),
@@ -114,12 +118,14 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _contentController,
+                    maxLines: 10,
+                    maxLength: 859,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     decoration: const InputDecoration(
                       labelText: 'Текст новости',
                       border: OutlineInputBorder(),
                       alignLabelWithHint: true,
                     ),
-                    maxLines: 10,
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
