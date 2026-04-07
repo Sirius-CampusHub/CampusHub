@@ -127,9 +127,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveNews,
-                      child: _isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text('Сохранить'),
+                      child: const Text('Сохранить'),
                     ),
                   ),
                 ],

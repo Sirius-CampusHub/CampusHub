@@ -17,14 +17,39 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
+  late final ScrollController _scrollController;
+  bool _isFabVisible = true;
+  double _lastScrollOffset = 0;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
     context.read<NewsBloc>().add(FetchNews());
   }
 
-  String _formatDate(DateTime date) {
+  void _onScroll() {
+    if (_scrollController.hasClients) {
+      final currentOffset = _scrollController.offset;
+      if (currentOffset > _lastScrollOffset && _isFabVisible) {
+        setState(() => _isFabVisible = false);
+      }
+      else if (currentOffset < _lastScrollOffset && !_isFabVisible) {
+        setState(() => _isFabVisible = true);
+      }
+      _lastScrollOffset = currentOffset;
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+    String _formatDate(DateTime date) {
     final utc = date.isUtc ? date : DateTime.utc(date.year, date.month, date.day, date.hour, date.minute, date.second);
     final local = utc.toLocal();
     return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';  }
@@ -33,8 +58,7 @@ class _NewsScreenState extends State<NewsScreen> {
   Widget build(BuildContext context) {
     final isAdmin = context.select((AuthBloc bloc) {
       final state = bloc.state;
-      // print("ROLE ${ state.user.role == UserRole.council}");
-      return  state.user.role == UserRole.council;
+      return  state is AuthAuthenticated && state.user.role == UserRole.council;
     });
 
     return Scaffold(
@@ -62,6 +86,7 @@ class _NewsScreenState extends State<NewsScreen> {
           }
 
           return ListView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: newsList.length,
             itemBuilder: (context, index) {
@@ -139,18 +164,15 @@ class _NewsScreenState extends State<NewsScreen> {
       ),
 
 
-      floatingActionButton: isAdmin ?
-      // floatingActionButton:
+      floatingActionButton: (isAdmin && _isFabVisible) ?
         FloatingActionButton(
           onPressed: () async {
             final created = await Navigator.push<bool>(
               context,
               MaterialPageRoute(builder: (_) => const CreateNewsScreen()),
             );
-            if (created == true) {
-              if(mounted){
-                context.read<NewsBloc>().add(FetchNews());
-              }
+            if (created == true && mounted) {
+              context.read<NewsBloc>().add(FetchNews());
             }
           },
           child: const Icon(Icons.add),

@@ -1,14 +1,15 @@
 // Models
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
-import 'package:client/domain/bloc/auth/auth_bloc.dart';
+
+import 'core/api_config.dart';
 import 'core/dependencies.dart';
+import 'domain/bloc/auth/auth_bloc.dart';
 import 'domain/bloc/news/news_bloc.dart';
 import 'network/http_client.dart';
 
 // Internal packages
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,7 +27,7 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  Dio dio = createAppHttpClient();
+  final dio = createAppHttpClient(baseUrl: ApiConfig.baseUrl);
 
   // FireBase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -52,7 +53,7 @@ void main() async {
       dependencies: dependencies,
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository)),
+          BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository))..add(AuthSubscriptionRequested()),
           BlocProvider(create: (_) => NewsBloc(newsRepository: dependencies.newsRepository)),
         ],
         child: MyApp(),

@@ -21,6 +21,7 @@ dependencies:
   dio: ^5.9.0
   bloc: ^9.2.0
   flutter_bloc: ^9.1.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
 
