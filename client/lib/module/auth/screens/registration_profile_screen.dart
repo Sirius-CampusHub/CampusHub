@@ -184,7 +184,8 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Expanded(
+                SizedBox(
+                  height: 320,
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
