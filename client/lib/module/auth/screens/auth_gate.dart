@@ -37,7 +37,7 @@ class AuthGate extends StatelessWidget {
               return const RegistrationProfileScreen();
             }
             return FutureBuilder<bool>(
-              future: context.dependencies.authRepository
+              future: () => context.dependencies.authRepository
                   .shouldShowRegistrationForUid(firebaseUser.uid),
               builder: (context, pendingSnap) {
                 if (pendingSnap.connectionState != ConnectionState.done) {
