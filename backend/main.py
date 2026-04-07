@@ -37,8 +37,7 @@ os.makedirs("uploads", exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Схема БД управляется миграциями Alembic (см. backend/alembic/).
     yield
 
 app = fastapi.FastAPI(
