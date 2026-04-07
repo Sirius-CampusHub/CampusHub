@@ -135,9 +135,16 @@ class _TopicView extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<TopicBloc>().add(
+              final topicBloc = context.read<TopicBloc>();
+              final refreshCompleted = topicBloc.stream.firstWhere(
+                (state) => state is TopicLoaded || state is TopicError,
+              );
+
+              topicBloc.add(
                 TopicLoadRequested(topicId: topicId),
               );
+
+              await refreshCompleted;
             },
             child: ListView.builder(
               itemCount: comments.length,

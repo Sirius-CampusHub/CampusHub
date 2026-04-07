@@ -144,7 +144,11 @@ class _ForumView extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<ForumBloc>().add(ForumLoadRequested());
+              final forumBloc = context.read<ForumBloc>();
+              forumBloc.add(ForumLoadRequested());
+              await forumBloc.stream.firstWhere(
+                (state) => state is ForumLoaded || state is ForumError,
+              );
             },
             child: ListView.builder(
               itemCount: topics.length,
@@ -191,8 +195,6 @@ class _TopicTile extends StatelessWidget {
           ],
         ),
         onTap: () {
-          // Действие по клику на топик — пока пустое
-          // (потом тут будет переход на экран комментариев)
           Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(topicId: topic.id, title: topic.title,)));
         },
       ),
