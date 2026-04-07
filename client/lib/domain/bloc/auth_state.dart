@@ -9,6 +9,9 @@ class AuthUnauthenticated extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+/// Firebase-аккаунт создан, ждём экран профиля и вызов бэкенда.
+class AuthAwaitingProfileCompletion extends AuthState {}
+
 class AuthAuthenticated extends AuthState {
   final UserModel user;
   AuthAuthenticated({required this.user});

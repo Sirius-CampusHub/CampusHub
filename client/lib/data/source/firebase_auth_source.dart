@@ -28,6 +28,13 @@ class FirebaseAuthDataSource {
     return credential.user!;
   }
 
+  Future<void> setUserDisplayName(String displayName) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    await user.updateProfile(displayName: displayName);
+    await user.reload();
+  }
+
   Future<firebase.User> signIn({required String email, required String password}) async {
     final credential = await _auth.signInWithEmailAndPassword(
       email: email,
