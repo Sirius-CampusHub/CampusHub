@@ -1,3 +1,4 @@
+import 'package:client/module/forum/topic_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,10 +14,13 @@ class ForumScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ForumBloc(
+      create: (context) =>
+      ForumBloc(
         repository: ForumRepository(),
-      )..add(ForumLoadRequested()),
+      )
+        ..add(ForumLoadRequested()),
       child: Scaffold(
+        appBar: AppBar(),
         body: const _ForumView(),
         floatingActionButton: Builder(
           builder: (context) => FloatingActionButton(
@@ -189,9 +193,7 @@ class _TopicTile extends StatelessWidget {
         onTap: () {
           // Действие по клику на топик — пока пустое
           // (потом тут будет переход на экран комментариев)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Клик по топику: ${topic.title}')),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(topicId: topic.id, title: topic.title,)));
         },
       ),
     );
