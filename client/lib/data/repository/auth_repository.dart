@@ -166,10 +166,7 @@ class AuthRepository {
       firebaseUser.email,
     );
 
-    final isBackendProfileComplete = await hasCompletedBackendProfile();
-    final model = isBackendProfileComplete
-        ? await getProfileData()
-        : RegistrationProfileData();
+    final model = await getProfileData();
     final authModel =
         ProfileModel(registrationProfileData: model, userModel: auth);
     return authModel;
