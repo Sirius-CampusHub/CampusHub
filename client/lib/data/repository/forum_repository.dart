@@ -27,7 +27,7 @@ class ForumRepository {
     return List.from(_mockTopics);
   }
 
-  Future<void> createTopic(String title, String description) async {
+  Future<void> createTopic(String title) async {
 
     // В будущем здесь будет реальный POST-запрос на эндпоинт
     _mockTopics.insert(

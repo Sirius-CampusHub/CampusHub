@@ -47,9 +47,9 @@ class ForumScreen extends StatelessWidget {
           top: 16,
         ),
         child: _CreateTopicForm(
-          onSubmit: (title, description) {
+          onSubmit: (title) {
             forumBloc.add(
-              ForumCreateTopicRequested(title: title, description: description),
+              ForumCreateTopicRequested(title: title),
             );
             Navigator.pop(modalContext);
           },
@@ -60,7 +60,7 @@ class ForumScreen extends StatelessWidget {
 }
 
 class _CreateTopicForm extends StatefulWidget {
-  final void Function(String title, String description) onSubmit;
+  final void Function(String title) onSubmit;
 
   const _CreateTopicForm({required this.onSubmit});
 
@@ -70,12 +70,10 @@ class _CreateTopicForm extends StatefulWidget {
 
 class _CreateTopicFormState extends State<_CreateTopicForm> {
   final _titleController = TextEditingController();
-  final _descController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
-    _descController.dispose();
     super.dispose();
   }
 
@@ -97,23 +95,13 @@ class _CreateTopicFormState extends State<_CreateTopicForm> {
           ),
         ),
         const SizedBox(height: 16),
-        TextField(
-          controller: _descController,
-          maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Краткое описание',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
               final title = _titleController.text.trim();
-              final desc = _descController.text.trim();
-              if (title.isNotEmpty && desc.isNotEmpty) {
-                widget.onSubmit(title, desc);
+              if (title.isNotEmpty) {
+                widget.onSubmit(title);
               }
             },
             child: const Text('Создать'),

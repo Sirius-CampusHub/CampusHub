@@ -65,7 +65,7 @@ class _CommentInputFieldState extends State<_CommentInputField> {
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
       ),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
         left: 12,
         right: 12,
         top: 8,
