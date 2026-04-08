@@ -15,13 +15,18 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
 
-  static const _titles = ['Новости', 'Форум', 'Расписание', 'Профиль'];
+  static const _titles = ['Профиль', 'Новости', 'Форум', 'Расписание'];
 
-  static const _pages = <Widget>[
-    NewsScreen(),
-    ForumScreen(),
-    ScheduleScreen(),
-    ProfileScreen(),
+  List<Widget> get _pages => [
+    const ProfileScreen(),
+    const NewsScreen(),
+    Navigator(
+      key: const ValueKey('forum_navigator'),
+      onGenerateRoute: (settings) => MaterialPageRoute(
+        builder: (context) => const ForumScreen(),
+      ),
+    ),
+    const ScheduleScreen(),
   ];
 
   @override
@@ -37,6 +42,11 @@ class _AppShellState extends State<AppShell> {
         },
         destinations: const [
           NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Профиль',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.newspaper_outlined),
             selectedIcon: Icon(Icons.newspaper),
             label: 'Новости',
@@ -50,11 +60,6 @@ class _AppShellState extends State<AppShell> {
             icon: Icon(Icons.calendar_today_outlined),
             selectedIcon: Icon(Icons.calendar_today),
             label: 'Расписание',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Профиль',
           ),
         ],
       ),
