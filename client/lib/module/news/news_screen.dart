@@ -8,6 +8,8 @@ import '../../domain/bloc/auth/auth_state.dart';
 import '../../domain/bloc/news/news_bloc.dart';
 import '../../domain/bloc/news/news_event.dart';
 import '../../domain/bloc/news/news_state.dart';
+import '../widgets/admin_fab.dart';
+import '../widgets/button_notifier.dart';
 import 'create_news_screen.dart';
 
 class NewsScreen extends StatefulWidget {
@@ -53,6 +55,12 @@ class _NewsScreenState extends State<NewsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<NewsBloc, NewsState>(
+        buildWhen: (previous, current) {
+          return current is NewsInitial ||
+              current is NewsLoading ||
+              current is NewsLoaded ||
+              current is NewsError;
+        },
         listener: (context, state) {
           if (state is NewsError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +69,7 @@ class _NewsScreenState extends State<NewsScreen> {
           }
         },
         builder: (context, state) {
-          if (state is NewsLoading) {
+          if ((state is NewsLoading) || (state is NewsInitial)) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -155,19 +163,16 @@ class _NewsScreenState extends State<NewsScreen> {
       ),
 
 
-      floatingActionButton: _AdminFab(
+      floatingActionButton: AdminFab(
         notifier: _buttonNotifier,
         onPressed: () async {
-          final created = await Navigator.push<bool>(
+          await Navigator.push<bool>(
             context,
             MaterialPageRoute(builder: (_) => const CreateNewsScreen()),
           );
-          if (created == true && context.mounted) {
-            context.read<NewsBloc>().add(FetchNews());
-          }
         },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        heroTag: 'news_fab',
+      )
     );
   }
 
@@ -191,53 +196,3 @@ class _NewsScreenState extends State<NewsScreen> {
     );
   }
 }
-
-class _AdminFab extends StatelessWidget {
-  final ValueListenable<bool> notifier;
-  final VoidCallback onPressed;
-
-  const _AdminFab({required this.notifier, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final isAdmin = context.select((AuthBloc bloc) {
-      final state = bloc.state;
-      return state is AuthAuthenticated && state.user.role == UserRole.council;
-    });
-
-    return ValueListenableBuilder<bool>(
-      valueListenable: notifier,
-      builder: (context, isFabVisible, child) {
-        if (!isAdmin || !isFabVisible) {
-          return const SizedBox.shrink();
-        }
-        return FloatingActionButton(
-          onPressed: onPressed,
-          child: const Icon(Icons.add),
-        );
-      },
-    );
-  }
-}
-
-class ButtonNotifier extends ChangeNotifier implements ValueListenable<bool> {
-  bool _value = true;
-  double _lastScrollOffset = 0;
-
-  @override
-  bool get value => _value;
-
-  double get lastScrollOffset => _lastScrollOffset;
-
-  void updateOnScroll(double currentOffset) {
-    final shouldShow = currentOffset <= 0 || currentOffset < _lastScrollOffset;
-
-    if (shouldShow != _value) {
-      _value = shouldShow;
-      notifyListeners();
-    }
-
-    _lastScrollOffset = currentOffset;
-  }
-}
-

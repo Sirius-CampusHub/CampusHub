@@ -8,6 +8,8 @@ import 'package:client/domain/bloc/forum/forum_state.dart';
 import 'package:client/domain/model/topic_model.dart';
 import 'package:client/domain/bloc/forum/forum_controller.dart';
 
+import '../widgets/admin_fab.dart';
+
 class ForumScreen extends StatelessWidget {
   const ForumScreen({super.key});
 
@@ -16,13 +18,11 @@ class ForumScreen extends StatelessWidget {
     return  Scaffold(
         appBar: AppBar(),
         body: const _ForumView(),
-        floatingActionButton: Builder(
-          builder: (context) => FloatingActionButton(
-            onPressed: () => _showCreateTopicModal(context),
-            child: const Icon(Icons.add),
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: AdminFab(
+        onPressed: () => _showCreateTopicModal(context),
+        heroTag: 'forum_fab',
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 

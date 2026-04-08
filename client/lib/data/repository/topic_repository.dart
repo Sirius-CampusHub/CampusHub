@@ -34,7 +34,7 @@ class TopicRepository {
   ];
 
   Future<List<CommentModel>> getComments(String topicId) async {
-    // return List.from(_mockComments.where((x) => x.topicId == topicId));
+    return List.from(_mockComments.where((x) => x.topicId == topicId));
     try {
       final rawToken = await _authDataSource.getToken();
       if (rawToken == null) {
@@ -63,40 +63,40 @@ class TopicRepository {
   }
 
   Future<void> createComment(String content, String topicId) async {
-    // _mockComments.insert(
-    //   0,
-    //   CommentModel(
-    //       id: DateTime.now().millisecondsSinceEpoch.toString(),
-    //       author: 'Текущий Пользователь',
-    //       content: content,
-    //       topicId: topicId,
-    //   )
-    // );
+    _mockComments.insert(
+      0,
+      CommentModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          author: 'Текущий Пользователь',
+          content: content,
+          topicId: topicId,
+      )
+    );
 
-    try {
-      final rawToken = await _authDataSource.getToken();
-      if (rawToken == null) {
-        await _authDataSource.deleteCurrentUser();
-        throw Exception('Не удалось получить токен после регистрации');
-      }
-      final formData = FormData.fromMap({
-        "topic_id": topicId,
-        "content": content
-      });
-
-      await _dio.post(
-        '/forum/topics/',
-        data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
-      );
-
-    } on DioException catch (e) {
-      final errorDetail = e.response?.data?['detail'] ?? e.message;
-      throw Exception("Ошибка создания комментария: $errorDetail");
-    }
+    // try {
+    //   final rawToken = await _authDataSource.getToken();
+    //   if (rawToken == null) {
+    //     await _authDataSource.deleteCurrentUser();
+    //     throw Exception('Не удалось получить токен после регистрации');
+    //   }
+    //   final formData = FormData.fromMap({
+    //     "topic_id": topicId,
+    //     "content": content
+    //   });
+    //
+    //   await _dio.post(
+    //     '/forum/topics/',
+    //     data: formData,
+    //     options: Options(
+    //       headers: {
+    //         'Authorization': 'Bearer $rawToken',
+    //       },
+    //     ),
+    //   );
+    //
+    // } on DioException catch (e) {
+    //   final errorDetail = e.response?.data?['detail'] ?? e.message;
+    //   throw Exception("Ошибка создания комментария: $errorDetail");
+    // }
   }
 }
