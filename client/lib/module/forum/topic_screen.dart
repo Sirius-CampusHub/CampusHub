@@ -1,5 +1,6 @@
 import 'package:client/domain/model/comment_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:client/domain/bloc/topic/topic_event.dart';
@@ -87,6 +88,8 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                 controller: _contentController,
                 minLines: 1,
                 maxLines: 5,
+                maxLength: 200,
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 decoration: InputDecoration(
                   hintText: 'Ваш комментарий...',
                   border: InputBorder.none,

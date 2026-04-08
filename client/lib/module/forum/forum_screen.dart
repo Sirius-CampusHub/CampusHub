@@ -1,5 +1,6 @@
 import 'package:client/module/forum/topic_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:client/domain/bloc/forum/forum_event.dart';
@@ -81,6 +82,8 @@ class _CreateTopicFormState extends State<_CreateTopicForm> {
         const SizedBox(height: 16),
         TextField(
           controller: _titleController,
+          maxLength: 50,
+          maxLengthEnforcement: MaxLengthEnforcement.enforced,
           decoration: const InputDecoration(
             labelText: 'Заголовок',
             border: OutlineInputBorder(),
