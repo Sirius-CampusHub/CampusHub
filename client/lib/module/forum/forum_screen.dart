@@ -2,7 +2,6 @@ import 'package:client/module/forum/topic_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:client/data/repository/forum_repository.dart';
 import 'package:client/domain/bloc/forum/forum_event.dart';
 import 'package:client/domain/bloc/forum/forum_state.dart';
 import 'package:client/domain/model/topic_model.dart';
@@ -13,13 +12,7 @@ class ForumScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-      ForumBloc(
-        repository: ForumRepository(),
-      )
-        ..add(ForumLoadRequested()),
-      child: Scaffold(
+    return  Scaffold(
         appBar: AppBar(),
         body: const _ForumView(),
         floatingActionButton: Builder(
@@ -29,7 +22,6 @@ class ForumScreen extends StatelessWidget {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      ),
     );
   }
 

@@ -2,13 +2,12 @@
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
 import 'package:client/domain/bloc/forum/forum_controller.dart';
-import 'core/api_config.dart';
 import 'core/dependencies.dart';
 import 'domain/bloc/auth/auth_bloc.dart';
 import 'domain/bloc/auth/auth_event.dart';
+import 'domain/bloc/forum/forum_event.dart';
 import 'domain/bloc/news/news_bloc.dart';
 import 'domain/bloc/schedule/schedule_bloc.dart';
-import 'domain/bloc/topic/topic_controller.dart';
 import 'network/http_client.dart';
 
 // Internal packages
@@ -75,8 +74,7 @@ void main() async {
           BlocProvider(create: (_) => ScheduleBloc(scheduleRepository: dependencies.scheduleRepository)),
           BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository)..add(AuthSubscriptionRequested())),
           BlocProvider(create: (_) => NewsBloc(newsRepository: dependencies.newsRepository)),
-          BlocProvider(create: (_) => ForumBloc(repository: dependencies.forumRepository)),
-          BlocProvider(create: (_) => TopicBloc(repository: dependencies.topicRepository)),
+          BlocProvider(create: (_) => ForumBloc(repository: dependencies.forumRepository)..add(ForumLoadRequested())),
         ],
         child: MyApp(),
       ),

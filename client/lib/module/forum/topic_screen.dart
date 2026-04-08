@@ -2,10 +2,11 @@ import 'package:client/domain/model/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:client/data/repository/topic_repository.dart';
 import 'package:client/domain/bloc/topic/topic_event.dart';
 import 'package:client/domain/bloc/topic/topic_state.dart';
 import 'package:client/domain/bloc/topic/topic_controller.dart';
+
+import '../../core/dependencies.dart';
 
 class TopicScreen extends StatelessWidget {
   final String topicId;
@@ -14,9 +15,10 @@ class TopicScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topicRepository = context.dependencies.topicRepository;
     return BlocProvider(
       create: (context) =>
-          TopicBloc(repository: TopicRepository())
+          TopicBloc(repository: topicRepository)
             ..add(TopicLoadRequested(topicId: topicId)),
       child: Scaffold(
         appBar: AppBar(title: Text(title)),
