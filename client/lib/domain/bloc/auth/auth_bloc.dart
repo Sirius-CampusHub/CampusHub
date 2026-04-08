@@ -1,5 +1,6 @@
 // Models imports
 import 'package:client/domain/model/model.dart';
+import 'package:client/domain/model/profile_model.dart';
 
 import 'auth_state.dart';
 import 'auth_event.dart';
@@ -32,11 +33,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final UserModel user = await _authRepository.signIn(
+      final ProfileModel user = await _authRepository.signIn(
         email: event.email,
         password: event.password,
       );
-      emit(AuthAuthenticated(user: user));
+      emit(AuthAuthenticated(profileModel: user));
     } catch (e) {
       print(e.toString());
       emit(AuthError(error: e as Exception));
@@ -75,7 +76,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final UserModel user =
           await _authRepository.completeRegistration(event.profile);
       await RegistrationDraftStorage.clearAll();
-      emit(AuthAuthenticated(user: user));
+      final authProfile = ProfileModel(registrationProfileData: event.profile, userModel: user);
+      emit(AuthAuthenticated(profileModel: authProfile));
     } catch (e) {
       print(e.toString());
       if (!_authRepository.isFirebaseSignedIn) {
@@ -109,7 +111,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final needsProfileCompletion =
             await _authRepository.shouldShowRegistrationForUid(user.id);
         if (needsProfileCompletion) return AuthAwaitingProfileCompletion();
-        return AuthAuthenticated(user: user);
+        final us = await _authRepository.getProfileData();
+        return AuthAuthenticated(profileModel: ProfileModel(registrationProfileData: us, userModel: user));
       }),
       onData: (state) => state,
       onError: (e, stackTrace) => AuthError(error: e as Exception),
