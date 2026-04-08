@@ -23,15 +23,17 @@ class TopicScreen extends StatelessWidget {
         body: Column(
           children: [
             Expanded(child: _TopicView(topicId: topicId)),
-            _CommentInputField(
-              onSubmit: (content) {
-                context.read<TopicBloc>().add(
-                  TopicCreateCommentRequested(
-                    content: content,
-                    topicId: topicId,
-                  ),
-                );
-              },
+            Builder(
+              builder: (context) => _CommentInputField(
+                  onSubmit: (content) {
+                    context.read<TopicBloc>().add(
+                      TopicCreateCommentRequested(
+                        content: content,
+                        topicId: topicId,
+                      ),
+                    );
+                  },
+                )
             ),
           ],
         ),
