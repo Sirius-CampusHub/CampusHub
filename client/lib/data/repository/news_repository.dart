@@ -7,9 +7,6 @@ class NewsRepository {
   final FirebaseAuthDataSource _authDataSource;
   final Dio _dio;
 
-  //TODO ВЫНЕСТИ
-  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/news';
-
   NewsRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
@@ -19,7 +16,7 @@ class NewsRepository {
     try {
       final rawToken = await _authDataSource.getToken();
       final response = await _dio.get(
-        '$_baseUrl/',
+        '/news',
         options: Options(
         headers: {
           'Authorization': 'Bearer $rawToken',
@@ -61,7 +58,7 @@ class NewsRepository {
       }
 
       final response = await _dio.post(
-        '$_baseUrl/',
+        '/news/',
         data: formData,
         options: Options(
           headers: {
@@ -88,7 +85,7 @@ class NewsRepository {
       final rawToken = await _authDataSource.getToken();
 
       await _dio.delete(
-          '$_baseUrl/$newsId',
+          '/news/$newsId',
             options: Options(
               headers: {
               'Authorization': 'Bearer $rawToken',

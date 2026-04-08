@@ -9,11 +9,17 @@ final class Dependencies {
     required this.authRepository,
     required this.newsRepository,
     required this.scheduleRepository,
+    required this.forumRepository,
+    required this.topicRepository,
+
   });
 
   final AuthRepository authRepository;
   final NewsRepository newsRepository;
   final ScheduleRepository scheduleRepository;
+  final ForumRepository forumRepository;
+  final TopicRepository topicRepository;
+
 }
 
 class DependenciesScope extends InheritedWidget {
