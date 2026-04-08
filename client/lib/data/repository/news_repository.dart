@@ -1,18 +1,28 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:client/domain/model/model.dart';
+import 'package:client/data/source/source.dart';
 
 class NewsRepository {
+  final FirebaseAuthDataSource _authDataSource;
   final Dio _dio;
 
-  //TODO ВЫНЕСТИ
-  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/news';
-
-  NewsRepository({required Dio dio}) : _dio = dio;
+  NewsRepository({
+    required Dio dio,
+    required FirebaseAuthDataSource authDataSource,
+  }) : _dio = dio, _authDataSource = authDataSource;
 
   Future<List<NewsModel>> getAllNews() async {
     try {
-      final response = await _dio.get('$_baseUrl/');
+      final rawToken = await _authDataSource.getToken();
+      final response = await _dio.get(
+        '/news',
+        options: Options(
+        headers: {
+          'Authorization': 'Bearer $rawToken',
+        },
+        ),
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -31,6 +41,7 @@ class NewsRepository {
     File? imageFile,
   }) async {
     try {
+      final rawToken = await _authDataSource.getToken();
       final formData = FormData.fromMap({
         "title": title,
         "content": content,
@@ -47,12 +58,17 @@ class NewsRepository {
       }
 
       final response = await _dio.post(
-        '$_baseUrl/',
+        '/news/',
         data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $rawToken',
+          },
+        ),
       );
 
       return NewsModel.fromJson(response.data);
-      
+
     } on DioException catch (e) {
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
@@ -66,7 +82,16 @@ class NewsRepository {
 
   Future<void> deleteNews(String newsId) async {
     try {
-      await _dio.delete('$_baseUrl/$newsId');
+      final rawToken = await _authDataSource.getToken();
+
+      await _dio.delete(
+          '/news/$newsId',
+            options: Options(
+              headers: {
+              'Authorization': 'Bearer $rawToken',
+            },
+        ),
+      );
     } on DioException catch (e) {
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Только студсовет может удалять новости.");

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:client/data/repository/forum_repository.dart';
-import 'package:client/domain/model/forum_event.dart';
-import 'package:client/domain/model/forum_state.dart';
+import 'package:client/domain/bloc/forum/forum_event.dart';
+import 'package:client/domain/bloc/forum/forum_state.dart';
 import 'package:client/domain/model/topic_model.dart';
-import 'package:client/module/forum/forum_controller.dart';
+import 'package:client/domain/bloc/forum/forum_controller.dart';
 
 class ForumScreen extends StatelessWidget {
   const ForumScreen({super.key});
