@@ -1,3 +1,4 @@
+import 'package:client/core/api_config.dart';
 import 'package:client/domain/model/model.dart';
 import 'package:dio/dio.dart';
 
@@ -32,8 +33,8 @@ class ScheduleRepository {
   }
 
   String _createLink(List<Object> args) {
-    String link = _url + '/?';
-    args.forEach((e) {link += "${e}&";});
+    String link = '${ApiConfig.baseUrl}/${_url}/?';
+    args.forEach((e) {link += e == args.last ? '$e' : "${e}&";});
     return link;
   }
 }

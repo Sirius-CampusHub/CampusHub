@@ -189,6 +189,7 @@ class AuthRepository {
   Future<RegistrationProfileData> getProfileData() async {
     if (await hasCompletedBackendProfile()) {
       final token = await _authDataSource.getToken(forceRefresh: true);
+      if (token == null) throw Exception('No token');
 
       try {
         final response = await _dio.get(
