@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,27 +19,20 @@ class NewsScreen extends StatefulWidget {
 
 class _NewsScreenState extends State<NewsScreen> {
   late final ScrollController _scrollController;
-  bool _isFabVisible = true;
-  double _lastScrollOffset = 0;
+  late final ButtonNotifier _buttonNotifier;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _buttonNotifier = ButtonNotifier();
     _scrollController.addListener(_onScroll);
     context.read<NewsBloc>().add(FetchNews());
   }
 
   void _onScroll() {
     if (_scrollController.hasClients) {
-      final currentOffset = _scrollController.offset;
-      if (currentOffset > _lastScrollOffset && _isFabVisible) {
-        setState(() => _isFabVisible = false);
-      }
-      else if (currentOffset < _lastScrollOffset && !_isFabVisible) {
-        setState(() => _isFabVisible = true);
-      }
-      _lastScrollOffset = currentOffset;
+      _buttonNotifier.updateOnScroll(_scrollController.offset);
     }
   }
 
@@ -46,6 +40,7 @@ class _NewsScreenState extends State<NewsScreen> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _buttonNotifier.dispose();
     super.dispose();
   }
 
@@ -56,11 +51,6 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = context.select((AuthBloc bloc) {
-      final state = bloc.state;
-      return  state is AuthAuthenticated && state.user.role == UserRole.council;
-    });
-
     return Scaffold(
       body: BlocConsumer<NewsBloc, NewsState>(
         listener: (context, state) {
@@ -86,7 +76,6 @@ class _NewsScreenState extends State<NewsScreen> {
           }
 
 
-
           return ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -101,7 +90,11 @@ class _NewsScreenState extends State<NewsScreen> {
                 surfaceTintColor: Colors.transparent,
                 clipBehavior: Clip.antiAlias,
                 child: GestureDetector(
-                  onLongPress: isAdmin ? () => _confirmDelete(context, news.id) : null,
+                  onLongPress:(){
+                    final isAdmin = context.read<AuthBloc>().state is AuthAuthenticated &&
+                        (context.read<AuthBloc>().state as AuthAuthenticated).user.role == UserRole.council;
+                    if (isAdmin) _confirmDelete(context, news.id);
+                  },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -162,19 +155,19 @@ class _NewsScreenState extends State<NewsScreen> {
       ),
 
 
-      floatingActionButton: (isAdmin && _isFabVisible) ?
-        FloatingActionButton(
-          onPressed: () async {
-            final created = await Navigator.push<bool>(
-              context,
-              MaterialPageRoute(builder: (_) => const CreateNewsScreen()),
-            );
-            if (created == true && mounted) {
-              context.read<NewsBloc>().add(FetchNews());
-            }
-          },
-          child: const Icon(Icons.add),
-          ): null,
+      floatingActionButton: _AdminFab(
+        notifier: _buttonNotifier,
+        onPressed: () async {
+          final created = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(builder: (_) => const CreateNewsScreen()),
+          );
+          if (created == true && context.mounted) {
+            context.read<NewsBloc>().add(FetchNews());
+          }
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -196,6 +189,55 @@ class _NewsScreenState extends State<NewsScreen> {
         ],
       ),
     );
+  }
+}
+
+class _AdminFab extends StatelessWidget {
+  final ValueListenable<bool> notifier;
+  final VoidCallback onPressed;
+
+  const _AdminFab({required this.notifier, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final isAdmin = context.select((AuthBloc bloc) {
+      final state = bloc.state;
+      return state is AuthAuthenticated && state.user.role == UserRole.council;
+    });
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: notifier,
+      builder: (context, isFabVisible, child) {
+        if (!isAdmin || !isFabVisible) {
+          return const SizedBox.shrink();
+        }
+        return FloatingActionButton(
+          onPressed: onPressed,
+          child: const Icon(Icons.add),
+        );
+      },
+    );
+  }
+}
+
+class ButtonNotifier extends ChangeNotifier implements ValueListenable<bool> {
+  bool _value = true;
+  double _lastScrollOffset = 0;
+
+  @override
+  bool get value => _value;
+
+  double get lastScrollOffset => _lastScrollOffset;
+
+  void updateOnScroll(double currentOffset) {
+    final shouldShow = currentOffset <= 0 || currentOffset < _lastScrollOffset;
+
+    if (shouldShow != _value) {
+      _value = shouldShow;
+      notifyListeners();
+    }
+
+    _lastScrollOffset = currentOffset;
   }
 }
 
