@@ -37,6 +37,10 @@ class ForumRepository {
     // return List.from(_mockTopics);
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final response = await _dio.get(
         '/forum/topics',
         options: Options(
@@ -70,6 +74,10 @@ class ForumRepository {
 
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final formData = FormData.fromMap({
         "title": title,
       });

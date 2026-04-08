@@ -37,6 +37,10 @@ class TopicRepository {
     // return List.from(_mockComments.where((x) => x.topicId == topicId));
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final response = await _dio.get(
         '/topic/comments',
         queryParameters: {'topic_id': topicId},
@@ -71,6 +75,10 @@ class TopicRepository {
 
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final formData = FormData.fromMap({
         "topic_id": topicId,
         "content": content

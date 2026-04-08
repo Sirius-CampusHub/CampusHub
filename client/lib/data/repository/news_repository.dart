@@ -15,8 +15,12 @@ class NewsRepository {
   Future<List<NewsModel>> getAllNews() async {
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final response = await _dio.get(
-        '/news',
+        '/news/',
         options: Options(
         headers: {
           'Authorization': 'Bearer $rawToken',
@@ -42,6 +46,10 @@ class NewsRepository {
   }) async {
     try {
       final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       final formData = FormData.fromMap({
         "title": title,
         "content": content,
@@ -83,7 +91,10 @@ class NewsRepository {
   Future<void> deleteNews(String newsId) async {
     try {
       final rawToken = await _authDataSource.getToken();
-
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
       await _dio.delete(
           '/news/$newsId',
             options: Options(
