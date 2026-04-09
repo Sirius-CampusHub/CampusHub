@@ -8,6 +8,7 @@ from auth.PromoteRequest import PromoteRequest
 from database.models import User as DBUser
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import get_db
+from database.models import USER_DISPLAY_NAME_MAX_LEN
 
 security = HTTPBearer()
 db_firestore = firestore.client()
