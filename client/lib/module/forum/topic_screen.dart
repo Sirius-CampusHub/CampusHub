@@ -98,6 +98,7 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
+                buildCounter: (context, {required currentLength, required maxLength, required isFocused}) => null,
               ),
             ),
             const SizedBox(width: 8),
