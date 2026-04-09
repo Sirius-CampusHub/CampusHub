@@ -282,6 +282,36 @@ class AuthRepository {
     }
   }
 
+  Future<RegistrationProfileData> getUser(String userId) async {
+    if (userId.isEmpty || userId.length < 10) {
+      throw Exception('Некорректный идентификатор пользователя');
+    }
+
+    final token = await _authDataSource.getToken(forceRefresh: true);
+    if (token == null) throw Exception('No token');
+
+    try {
+      final response = await _dio.get(
+        'profile/user/$userId',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return RegistrationProfileData.fromJson(data);
+      } else {
+        throw Exception('Неправильный формат ответа');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception('Пользователь не найден');
+      }
+      throw Exception('Ошибка загрузки профиля: ${e.message}');
+    }
+  }
+
   Future<bool> shouldShowRegistrationForUid(String uid) async {
     final pending = await RegistrationDraftStorage.isPendingForUid(uid);
     if (pending) return true;

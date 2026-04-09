@@ -15,19 +15,19 @@ class TopicRepository {
   final List<CommentModel> _mockComments = [
     const CommentModel(
         id: '1',
-        author: 'Daniel',
+        author_id: 'Daniel',
         content: 'first comment!',
         topicId: '1',
     ),
     const CommentModel(
         id: '2',
-        author: 'Hleb',
+        author_id: 'Hleb',
         content: 'another comment',
         topicId: '1',
     ),
     const CommentModel(
         id: '3',
-        author: 'Varya',
+        author_id: 'Varya',
         content: 'yet another comment',
         topicId: '2',
     ),
@@ -53,6 +53,7 @@ class TopicRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
+        print(response.data);
         return data
             .map(
               (json) => CommentModel.fromJson(

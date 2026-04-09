@@ -45,10 +45,14 @@ class _NewsScreenState extends State<NewsScreen> {
     super.dispose();
   }
 
-    String _formatDate(DateTime date) {
-    final utc = date.isUtc ? date : DateTime.utc(date.year, date.month, date.day, date.hour, date.minute, date.second);
+  String _formatDate(DateTime date) {
+    final utc = date.isUtc
+        ? date
+        : DateTime.utc(date.year, date.month, date.day, date.hour,
+        date.minute, date.second);
     final local = utc.toLocal();
-    return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';  }
+    return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,92 +79,114 @@ class _NewsScreenState extends State<NewsScreen> {
           final newsList = state is NewsLoaded
               ? state.newsList
               : state is NewsError
-                  ? (state.previousNewsList ?? const [])
-                  : const [];
+              ? (state.previousNewsList ?? const [])
+              : const [];
 
           if (newsList.isEmpty) {
             return const Center(child: Text('Нет новостей'));
           }
 
-          return ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: newsList.length,
-            itemBuilder: (context, index) {
-              final news = newsList[index];
+          return RefreshIndicator(
+            onRefresh: () async {
+              final newsBloc = context.read<NewsBloc>();
+              newsBloc.add(FetchNews());
+              try {
+                await newsBloc.stream
+                    .firstWhere(
+                      (state) => state is NewsLoaded || state is NewsError,
+                  orElse: () => NewsError(message: 'Unknown error'),
+                )
+                    .timeout(const Duration(seconds: 5));
+              } catch (e) {
+                rethrow;
+              }
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                final news = newsList[index];
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                clipBehavior: Clip.antiAlias,
-                child: GestureDetector(
-                  onLongPress:(){
-                    final isAdmin = context.read<AuthBloc>().state is AuthAuthenticated &&
-                        (context.read<AuthBloc>().state as AuthAuthenticated).profileModel.userModel.role == UserRole.council;
-                    if (isAdmin) _confirmDelete(context, news.id);
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (news.fullImageUrl != null && news.fullImageUrl!.isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: news.fullImageUrl!,
-                          width: double.infinity,
-                          fit: BoxFit.fitWidth,
-                          placeholder: (context, url) => const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                          errorWidget: (context, url, error) => const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Icon(Icons.broken_image, size: 80),
-                          ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              news.title,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                return Card(
+                  margin:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  clipBehavior: Clip.antiAlias,
+                  child: GestureDetector(
+                    onLongPress: () {
+                      final isAdmin = context.read<AuthBloc>().state
+                      is AuthAuthenticated &&
+                          (context.read<AuthBloc>().state
+                          as AuthAuthenticated)
+                              .profileModel
+                              .userModel
+                              .role ==
+                              UserRole.council;
+                      if (isAdmin) _confirmDelete(context, news.id);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (news.fullImageUrl != null &&
+                            news.fullImageUrl!.isNotEmpty)
+                          CachedNetworkImage(
+                            imageUrl: news.fullImageUrl!,
+                            width: double.infinity,
+                            fit: BoxFit.fitWidth,
+                            placeholder: (context, url) => const AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Center(child: CircularProgressIndicator()),
                             ),
-
-                            const SizedBox(height: 8),
-                            Text(
-                              news.content,
-                              textAlign: TextAlign.justify,
-                              style: const TextStyle(fontSize: 15),
+                            errorWidget: (context, url, error) =>
+                            const AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Icon(Icons.broken_image, size: 80),
                             ),
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                _formatDate(news.createdAt),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                news.title,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            )
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                news.content,
+                                textAlign: TextAlign.justify,
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  _formatDate(news.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
-
-
       floatingActionButton: AdminFab(
         notifier: _buttonNotifier,
         onPressed: () async {
@@ -170,7 +196,7 @@ class _NewsScreenState extends State<NewsScreen> {
           );
         },
         heroTag: 'news_fab',
-      )
+      ),
     );
   }
 
@@ -181,7 +207,8 @@ class _NewsScreenState extends State<NewsScreen> {
         title: const Text('Удалить новость?'),
         content: const Text('Это действие нельзя отменить.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Отмена')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Отмена')),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
