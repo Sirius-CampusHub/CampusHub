@@ -1,3 +1,4 @@
+import 'package:client/core/api_config.dart';
 import 'package:client/domain/model/model.dart';
 import 'package:dio/dio.dart';
 
@@ -6,7 +7,7 @@ class ScheduleRepository {
 
   ScheduleRepository({required Dio dio}) : _dio = dio;
 
-  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru/schedule';
+  static const String _url = 'schedule';
 
   Future<WeekScheduleModel> getSchedule(String group, int weekOffset) async {
     String url = _createLink([group, weekOffset]);
@@ -32,8 +33,8 @@ class ScheduleRepository {
   }
 
   String _createLink(List<Object> args) {
-    String link = _baseUrl + '/?';
-    args.forEach((e) {link += "${e}&";});
+    String link = '${ApiConfig.baseUrl}/${_url}/?';
+    args.forEach((e) {link += e == args.last ? '$e' : "${e}&";});
     return link;
   }
 }

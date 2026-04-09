@@ -22,7 +22,7 @@ class AdminFab extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAdmin = context.select((AuthBloc bloc) {
       final state = bloc.state;
-      return state is AuthAuthenticated && state.user.role == UserRole.council;
+      return state is AuthAuthenticated && state.profileModel.userModel.role == UserRole.council;
     });
 
     if (!isAdmin) return const SizedBox.shrink();

@@ -100,7 +100,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 child: GestureDetector(
                   onLongPress:(){
                     final isAdmin = context.read<AuthBloc>().state is AuthAuthenticated &&
-                        (context.read<AuthBloc>().state as AuthAuthenticated).user.role == UserRole.council;
+                        (context.read<AuthBloc>().state as AuthAuthenticated).profileModel.userModel.role == UserRole.council;
                     if (isAdmin) _confirmDelete(context, news.id);
                   },
                   child: Column(
