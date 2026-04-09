@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, DateTime
+from sqlalchemy import Column, String, Text, DateTime, Boolean
 from datetime import datetime, timezone
 import uuid
 from .database import Base
@@ -51,6 +51,7 @@ class Topics(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     title = Column(String(50), nullable=False)
+    anon = Column(Boolean, nullable=False, default=False)
 
 
 class Comments(Base):
