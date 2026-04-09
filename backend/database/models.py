@@ -44,3 +44,20 @@ class User(Base):
     group_code = Column(String(USER_GROUP_CODE_MAX_LEN), nullable=True)
     bio = Column(String(USER_BIO_MAX_LEN), nullable=True)
     telegram_handle = Column(String(USER_TELEGRAM_HANDLE_MAX_LEN), nullable=True)
+
+
+class Topics(Base):
+    __tablename__ = "topics"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    title = Column(String, nullable=False)
+
+
+class Comments(Base):
+    __tablename__ = "comments"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    topic_id = Column(String, nullable=False, index=True)
+    user_id = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=_utc_now_naive)

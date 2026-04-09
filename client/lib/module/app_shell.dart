@@ -15,10 +15,9 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
 
-  static const _titles = ['Профиль', 'Новости', 'Форум', 'Расписание'];
+  static const _titles = [ 'Новости', 'Форум', 'Расписание', 'Профиль',];
 
   List<Widget> get _pages => [
-    const ProfileScreen(),
     const NewsScreen(),
     Navigator(
       key: const ValueKey('forum_navigator'),
@@ -27,25 +26,21 @@ class _AppShellState extends State<AppShell> {
       ),
     ),
     const ScheduleScreen(),
+    const ProfileScreen(),
+
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text(_titles[_index])),
+      appBar: AppBar(title: Text(_titles[_index])),
       body: IndexedStack(index: _index, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) {
-          print(i);
           setState(() => _index = i);
         },
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Профиль',
-          ),
           NavigationDestination(
             icon: Icon(Icons.newspaper_outlined),
             selectedIcon: Icon(Icons.newspaper),
@@ -60,6 +55,11 @@ class _AppShellState extends State<AppShell> {
             icon: Icon(Icons.calendar_today_outlined),
             selectedIcon: Icon(Icons.calendar_today),
             label: 'Расписание',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Профиль',
           ),
         ],
       ),

@@ -1,7 +1,17 @@
 import 'package:client/domain/model/comment_model.dart';
+import 'package:dio/dio.dart';
+
+import '../source/firebase_auth_source.dart';
 
 class TopicRepository {
-  // Временно, далее должно подгружаться из кеша и обновляться от эндпоинта
+  final FirebaseAuthDataSource _authDataSource;
+  final Dio _dio;
+
+  TopicRepository({
+    required Dio dio,
+    required FirebaseAuthDataSource authDataSource,
+  }) : _dio = dio, _authDataSource = authDataSource;
+
   final List<CommentModel> _mockComments = [
     const CommentModel(
         id: '1',
@@ -25,11 +35,34 @@ class TopicRepository {
 
   Future<List<CommentModel>> getComments(String topicId) async {
     return List.from(_mockComments.where((x) => x.topicId == topicId));
+    try {
+      final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
+      final response = await _dio.get(
+        '/topic/comments',
+        queryParameters: {'topic_id': topicId},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $rawToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => CommentModel.fromJson(json)).toList();
+      } else {
+        throw Exception("Не удалось загрузить комментарии");
+      }
+    } on DioException catch (e) {
+      throw Exception("Ошибка сети при загрузке топиков: ${e.message}");
+    }
   }
 
   Future<void> createComment(String content, String topicId) async {
-
-    // В будущем здесь будет реальный POST-запрос на эндпоинт
     _mockComments.insert(
       0,
       CommentModel(
@@ -39,5 +72,31 @@ class TopicRepository {
           topicId: topicId,
       )
     );
+
+    // try {
+    //   final rawToken = await _authDataSource.getToken();
+    //   if (rawToken == null) {
+    //     await _authDataSource.deleteCurrentUser();
+    //     throw Exception('Не удалось получить токен после регистрации');
+    //   }
+    //   final formData = FormData.fromMap({
+    //     "topic_id": topicId,
+    //     "content": content
+    //   });
+    //
+    //   await _dio.post(
+    //     '/forum/topics/',
+    //     data: formData,
+    //     options: Options(
+    //       headers: {
+    //         'Authorization': 'Bearer $rawToken',
+    //       },
+    //     ),
+    //   );
+    //
+    // } on DioException catch (e) {
+    //   final errorDetail = e.response?.data?['detail'] ?? e.message;
+    //   throw Exception("Ошибка создания комментария: $errorDetail");
+    // }
   }
 }

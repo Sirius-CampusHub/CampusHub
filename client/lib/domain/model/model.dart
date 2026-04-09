@@ -6,3 +6,5 @@ export 'schedule_models/break_model.dart';
 export 'schedule_models/schedule_model.dart';
 export 'schedule_models/day_schedule_model.dart';
 export 'registration_profile.dart';
+export 'topic_model.dart';
+export 'comment_model.dart';

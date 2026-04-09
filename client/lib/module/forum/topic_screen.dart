@@ -1,11 +1,13 @@
 import 'package:client/domain/model/comment_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:client/data/repository/topic_repository.dart';
-import 'package:client/domain/model/topic_event.dart';
-import 'package:client/domain/model/topic_state.dart';
-import 'package:client/module/forum/topic_controller.dart';
+import 'package:client/domain/bloc/topic/topic_event.dart';
+import 'package:client/domain/bloc/topic/topic_state.dart';
+import 'package:client/domain/bloc/topic/topic_controller.dart';
+
+import '../../core/dependencies.dart';
 
 class TopicScreen extends StatelessWidget {
   final String topicId;
@@ -14,24 +16,27 @@ class TopicScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topicRepository = context.dependencies.topicRepository;
     return BlocProvider(
       create: (context) =>
-          TopicBloc(repository: TopicRepository())
+          TopicBloc(repository: topicRepository)
             ..add(TopicLoadRequested(topicId: topicId)),
       child: Scaffold(
         appBar: AppBar(title: Text(title)),
         body: Column(
           children: [
             Expanded(child: _TopicView(topicId: topicId)),
-            _CommentInputField(
-              onSubmit: (content) {
-                context.read<TopicBloc>().add(
-                  TopicCreateCommentRequested(
-                    content: content,
-                    topicId: topicId,
-                  ),
-                );
-              },
+            Builder(
+              builder: (context) => _CommentInputField(
+                  onSubmit: (content) {
+                    context.read<TopicBloc>().add(
+                      TopicCreateCommentRequested(
+                        content: content,
+                        topicId: topicId,
+                      ),
+                    );
+                  },
+                )
             ),
           ],
         ),
@@ -65,7 +70,7 @@ class _CommentInputFieldState extends State<_CommentInputField> {
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
       ),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
         left: 12,
         right: 12,
         top: 8,
@@ -83,6 +88,8 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                 controller: _contentController,
                 minLines: 1,
                 maxLines: 5,
+                maxLength: 200,
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 decoration: InputDecoration(
                   hintText: 'Ваш комментарий...',
                   border: InputBorder.none,
@@ -91,6 +98,7 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
+                buildCounter: (context, {required currentLength, required maxLength, required isFocused}) => null,
               ),
             ),
             const SizedBox(width: 8),

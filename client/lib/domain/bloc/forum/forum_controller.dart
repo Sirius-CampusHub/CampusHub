@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 
 import 'package:client/data/repository/forum_repository.dart';
-import 'package:client/domain/model/forum_event.dart';
-import 'package:client/domain/model/forum_state.dart';
+import 'package:client/domain/bloc/forum/forum_event.dart';
+import 'package:client/domain/bloc/forum/forum_state.dart';
 
 class ForumBloc extends Bloc<ForumEvent, ForumState> {
   final ForumRepository _repository;
@@ -34,7 +34,7 @@ class ForumBloc extends Bloc<ForumEvent, ForumState> {
   ) async {
     emit(ForumLoading());
     try {
-      await _repository.createTopic(event.title, event.description);
+      await _repository.createTopic(event.title);
       add(ForumLoadRequested());
     } catch (e) {
       emit(ForumError(error: e.toString()));
