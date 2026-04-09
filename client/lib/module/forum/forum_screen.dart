@@ -16,8 +16,7 @@ class ForumScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-        appBar: AppBar(),
-        body: const _ForumView(),
+      body: const _ForumView(),
       floatingActionButton: AdminFab(
         onPressed: () => _showCreateTopicModal(context),
         heroTag: 'forum_fab',
@@ -40,9 +39,12 @@ class ForumScreen extends StatelessWidget {
           top: 16,
         ),
         child: _CreateTopicForm(
-          onSubmit: (title) {
+          onSubmit: (title, isAnonymous) {
             forumBloc.add(
-              ForumCreateTopicRequested(title: title),
+              ForumCreateTopicRequested(
+                title: title,
+                isAnonymous: isAnonymous,
+              ),
             );
             Navigator.pop(modalContext);
           },
@@ -53,7 +55,7 @@ class ForumScreen extends StatelessWidget {
 }
 
 class _CreateTopicForm extends StatefulWidget {
-  final void Function(String title) onSubmit;
+  final void Function(String title, bool isAnonymous) onSubmit;
 
   const _CreateTopicForm({required this.onSubmit});
 
@@ -63,6 +65,7 @@ class _CreateTopicForm extends StatefulWidget {
 
 class _CreateTopicFormState extends State<_CreateTopicForm> {
   final _titleController = TextEditingController();
+  bool _isAnonymous = false;
 
   @override
   void dispose() {
@@ -90,13 +93,24 @@ class _CreateTopicFormState extends State<_CreateTopicForm> {
           ),
         ),
         const SizedBox(height: 16),
+        Row(
+          children: [
+            Checkbox(
+              value: _isAnonymous,
+              onChanged: (value) =>
+                  setState(() => _isAnonymous = value ?? false),
+            ),
+            const Text('Анонимный топик'),
+          ],
+        ),
+        const SizedBox(height: 8),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
               final title = _titleController.text.trim();
               if (title.isNotEmpty) {
-                widget.onSubmit(title);
+                widget.onSubmit(title, _isAnonymous);
               }
             },
             child: const Text('Создать'),
@@ -126,12 +140,27 @@ class _ForumView extends StatelessWidget {
           }
 
           return RefreshIndicator(
+            // onRefresh: () async {
+            //   final forumBloc = context.read<ForumBloc>();
+            //   forumBloc.add(ForumLoadRequested());
+            //   await forumBloc.stream.firstWhere(
+            //     (state) => state is ForumLoaded || state is ForumError,
+            //   );
+            // },
             onRefresh: () async {
               final forumBloc = context.read<ForumBloc>();
               forumBloc.add(ForumLoadRequested());
-              await forumBloc.stream.firstWhere(
-                (state) => state is ForumLoaded || state is ForumError,
-              );
+
+              try {
+                await forumBloc.stream
+                    .firstWhere(
+                      (state) => state is ForumLoaded || state is ForumError,
+                  orElse: () => ForumError(error: 'Unknown error'),
+                )
+                    .timeout(const Duration(seconds: 5));
+              } catch (e) {
+                  print("Ошибка $e");
+              }
             },
             child: ListView.builder(
               itemCount: topics.length,
@@ -169,7 +198,6 @@ class _TopicTile extends StatelessWidget {
           topic.title,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text('Автор: ${topic.author}'),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -178,7 +206,16 @@ class _TopicTile extends StatelessWidget {
           ],
         ),
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(topicId: topic.id, title: topic.title,)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TopicScreen(
+                topicId: topic.id,
+                title: topic.title,
+                isAnonymous: topic.isAnonymous,
+              ),
+            ),
+          );
         },
       ),
     );

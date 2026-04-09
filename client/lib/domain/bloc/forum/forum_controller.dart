@@ -34,7 +34,7 @@ class ForumBloc extends Bloc<ForumEvent, ForumState> {
   ) async {
     emit(ForumLoading());
     try {
-      await _repository.createTopic(event.title);
+      await _repository.createTopic(event.title, event.isAnonymous);
       add(ForumLoadRequested());
     } catch (e) {
       emit(ForumError(error: e.toString()));
