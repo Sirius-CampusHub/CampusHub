@@ -28,20 +28,20 @@ async def _get_db_topic(db: AsyncSession, uid: str) -> Topics | None:
 @topic_router.get("/comments", response_model=List[CommentScheme])
 async def get_comments(
         topic_id: str,
-        comment_author: dict = Depends(get_current_user),
+        user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
     comments_schemas = await db.execute(select(Comments).where(Comments.topic_id == topic_id).order_by(Comments.created_at.desc()))
     comments_models = comments_schemas.scalars().all()
 
     comments_schemas = []
+    topic = await _get_db_topic(db, topic_id)
     for comment in comments_models:
         comment_author = await _get_db_user(db, comment.user_id)
-        comment_topic = await _get_db_topic(db, comment.topic_id)
         comments_schemas.append({
             "content": comment.content,
             "comment_id": comment.id,
-            "author": "anon" if comment_author is None or comment_topic.anon else comment_author.display_name
+            "author": "anon" if topic.anon or comment_author is None  else comment_author.display_name
         })
 
     return comments_schemas
@@ -72,5 +72,5 @@ async def create_comment(
     return {
         "content": new_comment.content,
         "comment_id": new_comment.id,
-        "author": "anon" if author is None or topic.anon else author.display_name,
+        "author": "anon" if topic.anon or author is None else author.display_name,
     }
