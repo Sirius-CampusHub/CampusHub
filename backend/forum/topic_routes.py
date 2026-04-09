@@ -37,10 +37,11 @@ async def get_comments(
     comments_schemas = []
     for comment in comments_models:
         comment_author = await _get_db_user(db, comment.user_id)
+        comment_topic = await _get_db_topic(db, comment.topic_id)
         comments_schemas.append({
             "content": comment.content,
             "comment_id": comment.id,
-            "author": "anon" if comment_author is None or comment.anon else comment_author.display_name
+            "author": "anon" if comment_author is None or comment_topic.anon else comment_author.display_name
         })
 
     return comments_schemas
