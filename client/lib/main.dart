@@ -17,7 +17,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 
 // Screens
-import 'module/auth/screens/auth_gate.dart';
+import 'module/auth/auth_gate.dart';
 
 // Utils
 import 'utils/firebase_options.dart';

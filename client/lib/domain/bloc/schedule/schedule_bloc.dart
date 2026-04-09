@@ -19,8 +19,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     try {
       final week = await _scheduleRepository.getSchedule(event.group, event.weekOffset);
       emit(ScheduleHasWeek(week: week));
-    } on Exception catch (e) {
-      emit(ScheduleError(error: e));
+    } catch (e, stacktrace) {
+      print(e);
+      print(stacktrace);
+      emit(ScheduleError(error: e.toString()));
     }
   }
 }
