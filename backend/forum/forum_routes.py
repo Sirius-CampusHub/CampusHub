@@ -44,10 +44,13 @@ async def get_all_news(
 @forum_router.post("/topics", response_model=TopicScheme)
 async def create_topic(
         request: CreateTopicRequest,
-        user: dict = Depends(get_current_user),
+        user: dict = Depends(require_council_role),
         db: AsyncSession = Depends(get_db)
 ):
-    new_topic = Topics(title=request.title)
+    title = request.title
+    if len(title) > 50:
+        raise HTTPException(status_code=400, detail="Title too long")
+    new_topic = Topics(title=title)
     db.add(new_topic)
     await db.commit()
     await db.refresh(new_topic)

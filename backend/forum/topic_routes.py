@@ -3,11 +3,10 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func
 
-from auth.auth_routes import get_current_user, require_council_role
+from auth.auth_routes import get_current_user
 from .schemas import Comment as CommentScheme, CreateCommentRequest
-from database.models import Topics, Comments, User
+from database.models import Comments, User
 from database.database import get_db
 
 topic_router = APIRouter(
@@ -32,10 +31,11 @@ async def get_all_news(
 
     comments_schemas = []
     for comment in comments_models:
+        user = await _get_db_user(db, comment.user_id)
         comments_schemas.append({
             "content": comment.content,
             "comment_id": comment.id,
-            "author": comment.user_id
+            "author": user.display_name
         })
 
     return comments_schemas
@@ -44,9 +44,11 @@ async def get_all_news(
 @topic_router.post("/comments", response_model=CommentScheme)
 async def create_topic(
         request: CreateCommentRequest,
-        user: dict = Depends(require_council_role),
+        user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
+    if len(request.content) > 200:
+        raise HTTPException(status_code=400, detail="Comment too long")
     new_comment = Comments(content=request.content, topic_id=request.topic_id, user_id=user.get("uid"))
     db.add(new_comment)
     await db.commit()
