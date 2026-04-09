@@ -152,7 +152,7 @@ class _ForumView extends StatelessWidget {
                 )
                     .timeout(const Duration(seconds: 5));
               } catch (e) {
-                  print("Ошибка $e");
+                rethrow;
               }
             },
             child: ListView.builder(

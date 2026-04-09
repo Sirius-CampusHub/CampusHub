@@ -90,9 +90,6 @@ class AuthRepository {
 
       await _authDataSource.getToken(forceRefresh: true);
 
-      // final token = await _authDataSource.getToken(forceRefresh: true);
-      // print("Bearer ${token.toString()}");
-
       final uid = _authDataSource.currentUser?.uid;
       if (uid == null) {
         throw Exception('Сессия потеряна после регистрации');
@@ -108,10 +105,8 @@ class AuthRepository {
 
       return newUser;
     } on firebase.FirebaseAuthException {
-      print('Ошибка при регистрации.');
       rethrow;
     } catch (e) {
-      // TODO: Логирование
       rethrow;
     }
   }
@@ -169,8 +164,7 @@ class AuthRepository {
     final authModel =
         ProfileModel(registrationProfileData: model, userModel: auth);
     return authModel;
-      // String? token = await _authDataSource.getToken(forceRefresh: true);
-      // print("Bearer "+ token.toString());
+
   }
 
   Future<void> signOut() async {
@@ -201,8 +195,6 @@ class AuthRepository {
 
         final data = response.data;
 
-        // TODO убрать
-        print(data);
         if (data is! Map<String, dynamic>) {
           throw Exception(
               'Неправильный формат response при логине.');
@@ -211,7 +203,6 @@ class AuthRepository {
         final model = RegistrationProfileData.fromJson(data);
         return model;
       } on DioException catch (e) {
-        print(e);
         rethrow;
       } catch (e) {
         rethrow;
@@ -282,13 +273,11 @@ class AuthRepository {
       return (displayName != null && displayName.isNotEmpty) &&
           (avatarEmoji != null && avatarEmoji.isNotEmpty);
     } on DioException catch (e) {
-      print(e.message);
       if (e.response?.statusCode == 404) {
         return false;
       }
       return false;
     } catch (e) {
-      print(e.toString());
       return false;
     }
   }
