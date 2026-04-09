@@ -1,3 +1,5 @@
+import 'package:client/core/api_config.dart';
+
 class NewsModel {
   final String id;
   final String title;
@@ -6,7 +8,6 @@ class NewsModel {
   final String authorId;
   final DateTime createdAt;
 
-  static const String _baseUrl = 'https://siriusapi.kod.polytech-schedule.ru';
 
   NewsModel({
     required this.id,
@@ -19,7 +20,7 @@ class NewsModel {
 
   String? get fullImageUrl {
     if (imageUrl == null || imageUrl!.isEmpty) return null;
-    return '$_baseUrl$imageUrl';
+    return '${ApiConfig.baseUrl}$imageUrl';
   }
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -29,7 +30,7 @@ class NewsModel {
       content: json['content'] as String,
       imageUrl: json['image_url'] as String?,
       authorId: json['author_id'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String), 
+      createdAt: DateTime.parse(json['created_at']).toUtc(),
     );
   }
 }

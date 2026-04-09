@@ -35,6 +35,7 @@ class Event(BaseModel):
             result = []
             teachers = test_teacher.split(',')
             for teacher in teachers:
+                teacher = teacher.strip()
                 args = teacher.split(' ')
                 if len(args) == 2:
                     last_name, first_name = args

@@ -5,9 +5,10 @@ from sqlalchemy import update
 from sqlalchemy.dialects.postgresql import insert
 
 from auth.PromoteRequest import PromoteRequest
-from database.models import User as DBUser, USER_DISPLAY_NAME_MAX_LEN
+from database.models import User as DBUser
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import get_db
+from database.models import USER_DISPLAY_NAME_MAX_LEN
 
 security = HTTPBearer()
 db_firestore = firestore.client()
@@ -64,18 +65,18 @@ async def init_new_user(
             role="student",
             display_name=display_name,
         )
-
+        
         stmt = stmt.on_conflict_do_update(
-            index_elements=["id"],
+            index_elements=['id'],
             set_={
                 "email": email,
             },
         )
-
+        
         await db.execute(stmt)
         await db.commit()
         return {"status": "ok"}
-
+        
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
