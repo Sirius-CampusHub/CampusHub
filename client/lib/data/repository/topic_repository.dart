@@ -1,4 +1,4 @@
-import 'package:client/domain/model/comment_model.dart';
+import 'package:client/domain/model/forum_models/comment_model.dart';
 import 'package:dio/dio.dart';
 
 import '../source/firebase_auth_source.dart';
@@ -74,15 +74,6 @@ class TopicRepository {
     String content,
     String topicId,
   ) async {
-    // _mockComments.insert(
-    //   0,
-    //   CommentModel(
-    //       id: DateTime.now().millisecondsSinceEpoch.toString(),
-    //       author: 'Текущий Пользователь',
-    //       content: content,
-    //       topicId: topicId,
-    //   )
-    // );
 
     try {
       final rawToken = await _authDataSource.getToken();

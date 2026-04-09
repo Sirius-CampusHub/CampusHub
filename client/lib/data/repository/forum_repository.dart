@@ -1,4 +1,4 @@
-import 'package:client/domain/model/topic_model.dart';
+import 'package:client/domain/model/forum_models/topic_model.dart';
 import 'package:dio/dio.dart';
 
 import '../source/firebase_auth_source.dart';
@@ -49,8 +49,6 @@ class ForumRepository {
           },
         ),
       );
-      print('=== RESPONSE DATA TYPE: ${response.data.runtimeType}');
-      print('=== RESPONSE DATA: ${response.data}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -81,13 +79,9 @@ class ForumRepository {
       }
       final formData = {
         'title': title,
-        // backend seems to use `anon`
         'anon': isAnonymous,
-        // keep for backwards compatibility if backend also supports it
-        'is_anonymous': isAnonymous,
       };
 
-      print('=== SENDING POST to /forum/topics with data: $formData');
       final response = await _dio.post(
         '/forum/topics',
         data: formData,
@@ -95,14 +89,8 @@ class ForumRepository {
           headers: {'Authorization': 'Bearer $rawToken'},
         ),
       );
-      print('=== CREATE TOPIC RESPONSE status: ${response.statusCode}');
-      print('=== CREATE TOPIC RESPONSE data type: ${response.data.runtimeType}');
-      print('=== CREATE TOPIC RESPONSE data: ${response.data}');
     } on DioException catch (e) {
-      print('=== DIO EXCEPTION: ${e.message}');
-      print('=== RESPONSE status: ${e.response?.statusCode}');
-      print('=== RESPONSE data type: ${e.response?.data.runtimeType}');
-      print('=== RESPONSE data: ${e.response?.data}');
+
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
       }

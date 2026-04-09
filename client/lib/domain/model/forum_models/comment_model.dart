@@ -2,7 +2,7 @@ class CommentModel {
   final String id;
   final String author;
   final String content;
-  final String topicId; // не отдают с бека
+  final String topicId;
 
   const CommentModel({
     required this.id,

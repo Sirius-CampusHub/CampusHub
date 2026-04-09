@@ -1,4 +1,4 @@
-import 'package:client/domain/model/topic_model.dart';
+import 'package:client/domain/model/forum_models/topic_model.dart';
 
 abstract class ForumState {}
 

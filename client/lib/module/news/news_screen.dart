@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:client/domain/model/user_role.dart';
+import 'package:client/domain/model/user_models/user_role.dart';
 import '../../domain/bloc/auth/auth_bloc.dart';
 import '../../domain/bloc/auth/auth_state.dart';
 import '../../domain/bloc/news/news_bloc.dart';

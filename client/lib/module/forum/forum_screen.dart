@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:client/domain/bloc/forum/forum_event.dart';
 import 'package:client/domain/bloc/forum/forum_state.dart';
-import 'package:client/domain/model/topic_model.dart';
+import 'package:client/domain/model/forum_models/topic_model.dart';
 import 'package:client/domain/bloc/forum/forum_controller.dart';
 
 import '../widgets/admin_fab.dart';
@@ -140,13 +140,6 @@ class _ForumView extends StatelessWidget {
           }
 
           return RefreshIndicator(
-            // onRefresh: () async {
-            //   final forumBloc = context.read<ForumBloc>();
-            //   forumBloc.add(ForumLoadRequested());
-            //   await forumBloc.stream.firstWhere(
-            //     (state) => state is ForumLoaded || state is ForumError,
-            //   );
-            // },
             onRefresh: () async {
               final forumBloc = context.read<ForumBloc>();
               forumBloc.add(ForumLoadRequested());

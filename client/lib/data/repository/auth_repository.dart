@@ -1,4 +1,3 @@
-import 'package:client/core/api_config.dart';
 import 'package:client/domain/model/profile_model.dart';
 import 'package:dio/dio.dart';
 import 'package:client/data/local/registration_draft_storage.dart';

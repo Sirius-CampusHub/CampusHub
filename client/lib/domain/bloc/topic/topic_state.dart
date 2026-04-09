@@ -1,4 +1,4 @@
-import 'package:client/domain/model/comment_model.dart';
+import 'package:client/domain/model/forum_models/comment_model.dart';
 
 abstract class TopicState {}
 
