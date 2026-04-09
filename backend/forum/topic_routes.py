@@ -48,7 +48,9 @@ async def get_comments(
             {
                 "content": comment.content,
                 "comment_id": comment.id,
-                "author": "" if topic.anon or comment_author is None else comment_author.id
+                "author": (
+                    "" if topic.anon or comment_author is None else comment_author.id
+                ),
             }
         )
 
