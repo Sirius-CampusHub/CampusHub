@@ -3,11 +3,10 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func
 
-from auth.auth_routes import get_current_user, require_council_role
+from auth.auth_routes import get_current_user
 from .schemas import Comment as CommentScheme, CreateCommentRequest
-from database.models import Topics, Comments, User
+from database.models import Comments, User
 from database.database import get_db
 
 topic_router = APIRouter(
@@ -22,40 +21,44 @@ async def _get_db_user(db: AsyncSession, uid: str) -> User | None:
 
 
 @topic_router.get("/comments", response_model=List[CommentScheme])
-async def get_all_news(
+async def get_comments(
         topic_id: str,
-        user: dict = Depends(get_current_user),
+        comment_author: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
-    comments_schemas = await db.execute(select(Comments).where(Comments.topic_id == topic_id))
+    comments_schemas = await db.execute(select(Comments).where(Comments.topic_id == topic_id).order_by(Comments.created_at.desc()))
     comments_models = comments_schemas.scalars().all()
 
     comments_schemas = []
     for comment in comments_models:
+        comment_author = await _get_db_user(db, comment.user_id)
         comments_schemas.append({
             "content": comment.content,
             "comment_id": comment.id,
-            "author": comment.user_id
+            "author": "anon" if comment_author is None else comment_author.display_name
         })
 
     return comments_schemas
 
 
 @topic_router.post("/comments", response_model=CommentScheme)
-async def create_topic(
+async def create_comment(
         request: CreateCommentRequest,
-        user: dict = Depends(require_council_role),
+        user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
-    new_comment = Comments(content=request.content, topic_id=request.topic_id, user_id=user.get("uid"))
+    content = request.content.strip()
+    if not 1 < len(content) < 200:
+        raise HTTPException(status_code=400, detail="Comment content is invalid")
+    new_comment = Comments(content=content, topic_id=request.topic_id, user_id=author.get("uid"))
     db.add(new_comment)
     await db.commit()
     await db.refresh(new_comment)
 
-    user = await _get_db_user(db, new_comment.user_id)
+    author = await _get_db_user(db, new_comment.user_id)
 
     return {
         "content": new_comment.content,
         "comment_id": new_comment.id,
-        "author": user.display_name
+        "author": "anon" if author is None else author.display_name
     }

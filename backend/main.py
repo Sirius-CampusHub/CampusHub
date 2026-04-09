@@ -5,7 +5,6 @@ import os
 import json
 import base64
 from dotenv import load_dotenv
-from database.database import engine, Base
 
 load_dotenv()
 
@@ -53,3 +52,4 @@ app.include_router(profiles.router)
 app.include_router(news.router)
 app.include_router(schedule.router)
 app.include_router(forum.forum_router)
+app.include_router(forum.topic_router)
