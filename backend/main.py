@@ -34,9 +34,13 @@ import forum
 
 os.makedirs("uploads", exist_ok=True)
 
+
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI):
-    # Схема БД управляется миграциями Alembic (см. backend/alembic/).
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    print("База данных готова (таблицы созданы/проверены)")
     yield
 
 app = fastapi.FastAPI(
