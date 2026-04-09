@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:client/domain/bloc/auth/auth_bloc.dart';
 import 'package:client/domain/bloc/auth/auth_event.dart';
 import 'package:client/domain/bloc/auth/auth_state.dart';
-import 'package:client/module/auth/screens/login_screen.dart';
+import 'package:client/module/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
