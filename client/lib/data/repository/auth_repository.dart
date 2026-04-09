@@ -91,8 +91,8 @@ class AuthRepository {
 
       await _authDataSource.getToken(forceRefresh: true);
 
-      //final token = await _authDataSource.getToken(forceRefresh: true);
-      //print("Bearer ${token.toString()}");
+      final token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer ${token.toString()}");
 
       final uid = _authDataSource.currentUser?.uid;
       if (uid == null) {
@@ -170,8 +170,8 @@ class AuthRepository {
     final authModel =
         ProfileModel(registrationProfileData: model, userModel: auth);
     return authModel;
-      //String? token = await _authDataSource.getToken(forceRefresh: true);
-      //print("Bearer "+ token.toString());
+      String? token = await _authDataSource.getToken(forceRefresh: true);
+      print("Bearer "+ token.toString());
   }
 
   Future<void> signOut() async {
