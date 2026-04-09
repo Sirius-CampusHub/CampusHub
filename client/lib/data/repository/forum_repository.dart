@@ -10,7 +10,8 @@ class ForumRepository {
   ForumRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+  }) : _dio = dio,
+       _authDataSource = authDataSource;
 
   final List<TopicModel> _mockTopics = [
     const TopicModel(
@@ -43,11 +44,7 @@ class ForumRepository {
       }
       final response = await _dio.get(
         '/forum/topics',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
 
       if (response.statusCode == 200) {

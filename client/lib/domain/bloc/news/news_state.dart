@@ -16,10 +16,7 @@ class NewsError extends NewsState {
   final String message;
   final List<NewsModel>? previousNewsList;
 
-  NewsError({
-    required this.message,
-    this.previousNewsList,
-  });
+  NewsError({required this.message, this.previousNewsList});
 }
 
 class NewsCreateSuccess extends NewsState {}

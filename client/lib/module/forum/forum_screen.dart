@@ -15,9 +15,9 @@ class ForumScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(),
-        body: const _ForumView(),
+    return Scaffold(
+      appBar: AppBar(),
+      body: const _ForumView(),
       floatingActionButton: AdminFab(
         onPressed: () => _showCreateTopicModal(context),
         heroTag: 'forum_fab',
@@ -41,9 +41,7 @@ class ForumScreen extends StatelessWidget {
         ),
         child: _CreateTopicForm(
           onSubmit: (title) {
-            forumBloc.add(
-              ForumCreateTopicRequested(title: title),
-            );
+            forumBloc.add(ForumCreateTopicRequested(title: title));
             Navigator.pop(modalContext);
           },
         ),
@@ -117,8 +115,7 @@ class _ForumView extends StatelessWidget {
       builder: (context, state) {
         if (state is ForumInitial || state is ForumLoading) {
           return const Center(child: CircularProgressIndicator());
-        }
-        else if (state is ForumLoaded) {
+        } else if (state is ForumLoaded) {
           final topics = state.topics;
 
           if (topics.isEmpty) {
@@ -178,7 +175,13 @@ class _TopicTile extends StatelessWidget {
           ],
         ),
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(topicId: topic.id, title: topic.title,)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  TopicScreen(topicId: topic.id, title: topic.title),
+            ),
+          );
         },
       ),
     );

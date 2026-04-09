@@ -10,26 +10,27 @@ class TopicRepository {
   TopicRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+  }) : _dio = dio,
+       _authDataSource = authDataSource;
 
   final List<CommentModel> _mockComments = [
     const CommentModel(
-        id: '1',
-        author: 'Daniel',
-        content: 'first comment!',
-        topicId: '1',
+      id: '1',
+      author: 'Daniel',
+      content: 'first comment!',
+      topicId: '1',
     ),
     const CommentModel(
-        id: '2',
-        author: 'Hleb',
-        content: 'another comment',
-        topicId: '1',
+      id: '2',
+      author: 'Hleb',
+      content: 'another comment',
+      topicId: '1',
     ),
     const CommentModel(
-        id: '3',
-        author: 'Varya',
-        content: 'yet another comment',
-        topicId: '2',
+      id: '3',
+      author: 'Varya',
+      content: 'yet another comment',
+      topicId: '2',
     ),
   ];
 
@@ -44,11 +45,7 @@ class TopicRepository {
       final response = await _dio.get(
         '/topic/comments',
         queryParameters: {'topic_id': topicId},
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
 
       if (response.statusCode == 200) {
@@ -66,11 +63,11 @@ class TopicRepository {
     _mockComments.insert(
       0,
       CommentModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          author: 'Текущий Пользователь',
-          content: content,
-          topicId: topicId,
-      )
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        author: 'Текущий Пользователь',
+        content: content,
+        topicId: topicId,
+      ),
     );
 
     // try {

@@ -117,9 +117,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       _error = null;
     });
     try {
-      final updated = await context.dependencies.authRepository.updateProfileData(
-        data,
-      );
+      final updated = await context.dependencies.authRepository
+          .updateProfileData(data);
       if (!mounted) return;
       Navigator.of(context).pop(updated);
     } catch (e) {
@@ -155,11 +154,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   height: 320,
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
                     itemCount: Emoji.avatarEmojiOptions.length,
                     itemBuilder: (context, index) {
                       final emoji = Emoji.avatarEmojiOptions[index];

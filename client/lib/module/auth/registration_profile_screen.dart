@@ -186,41 +186,41 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
                   height: 320,
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
                     itemCount: Emoji.avatarEmojiOptions.length,
                     itemBuilder: (context, index) {
                       final emoji = Emoji.avatarEmojiOptions[index];
                       final isSelected = emoji == _selectedAvatarEmoji;
                       return Material(
-                          color: isSelected
-                              ? theme.colorScheme.primaryContainer
-                              : theme.colorScheme.surfaceContainerHighest
-                                    .withValues(alpha: 0.5),
-                          shape: const CircleBorder(),
-                          child: InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: () {
-                              setState(() {
-                                _selectedAvatarEmoji = emoji;
-                                _error = null;
-                              });
-                              _schedulePersistDraft();
-                              Navigator.of(ctx).pop();
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Text(
-                                emoji,
-                                style: const TextStyle(fontSize: 26),
-                              ),
+                        color: isSelected
+                            ? theme.colorScheme.primaryContainer
+                            : theme.colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.5),
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            setState(() {
+                              _selectedAvatarEmoji = emoji;
+                              _error = null;
+                            });
+                            _schedulePersistDraft();
+                            Navigator.of(ctx).pop();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Text(
+                              emoji,
+                              style: const TextStyle(fontSize: 26),
                             ),
                           ),
-                        );
-
+                        ),
+                      );
                     },
                   ),
                 ),

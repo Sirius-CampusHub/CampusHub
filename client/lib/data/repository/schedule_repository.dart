@@ -19,9 +19,13 @@ class ScheduleRepository {
         if (data.isEmpty) throw Exception('Такой группы не существует.');
         return WeekScheduleModel.fromJson(data);
       } else if (response.statusCode == 422) {
-        throw Exception('Неправильный запрос: ${response.data['detail']['msg']}');
+        throw Exception(
+          'Неправильный запрос: ${response.data['detail']['msg']}',
+        );
       } else {
-        throw Exception("Ошибка при запросе на получение расписания группы ${group}. Код ошибки: ${response.statusCode}");
+        throw Exception(
+          "Ошибка при запросе на получение расписания группы ${group}. Код ошибки: ${response.statusCode}",
+        );
       }
     } on DioException catch (e) {
       // TODO log error

@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase;
 class FirebaseAuthDataSource {
   final firebase.FirebaseAuth _auth;
 
-  FirebaseAuthDataSource({required firebase.FirebaseAuth auth})
-      : _auth = auth;
+  FirebaseAuthDataSource({required firebase.FirebaseAuth auth}) : _auth = auth;
 
   Stream<firebase.User?> get authStateChanges => _auth.authStateChanges();
 
@@ -19,12 +18,16 @@ class FirebaseAuthDataSource {
     }
   }
 
-  Future<firebase.User> signUp({required String email, required String password}) async {
+  Future<firebase.User> signUp({
+    required String email,
+    required String password,
+  }) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    if (credential.user == null) throw Exception("Ошибка создания пользователя");
+    if (credential.user == null)
+      throw Exception("Ошибка создания пользователя");
     return credential.user!;
   }
 
@@ -35,7 +38,10 @@ class FirebaseAuthDataSource {
     await user.reload();
   }
 
-  Future<firebase.User> signIn({required String email, required String password}) async {
+  Future<firebase.User> signIn({
+    required String email,
+    required String password,
+  }) async {
     final credential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -45,7 +51,7 @@ class FirebaseAuthDataSource {
   }
 
   Future<void> signOut() => _auth.signOut();
-  
+
   Future<void> deleteCurrentUser() async {
     await _auth.currentUser?.delete();
   }

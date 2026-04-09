@@ -8,7 +8,6 @@ class NewsModel {
   final String authorId;
   final DateTime createdAt;
 
-
   NewsModel({
     required this.id,
     required this.title,

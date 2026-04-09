@@ -35,14 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (_isLogin) {
-      context.read<AuthBloc>().add(AuthSignInRequested(email: email, password: password));
+      context.read<AuthBloc>().add(
+        AuthSignInRequested(email: email, password: password),
+      );
       return;
     }
 
     setState(() => _error = null);
     context.read<AuthBloc>().add(
-          AuthSignUpBasicRequested(email: email, password: password),
-        );
+      AuthSignUpBasicRequested(email: email, password: password),
+    );
   }
 
   String? _getErrorMessage(Exception error) {

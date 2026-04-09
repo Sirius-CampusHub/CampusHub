@@ -5,13 +5,10 @@ class UserFirestoreDataSource {
   final FirebaseFirestore _firestore;
 
   UserFirestoreDataSource({required FirebaseFirestore firestore})
-      : _firestore = firestore;
+    : _firestore = firestore;
 
   Future<void> saveUser(UserModel user) async {
-    await _firestore
-        .collection('users')
-        .doc(user.id)
-        .set(user.toFirestore());
+    await _firestore.collection('users').doc(user.id).set(user.toFirestore());
   }
 
   Future<UserModel?> getUser(String uid) async {

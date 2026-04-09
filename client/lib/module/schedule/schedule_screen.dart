@@ -42,7 +42,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     super.didChangeDependencies();
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
-      final groupCode = authState.profileModel.registrationProfileData.groupCode;
+      final groupCode =
+          authState.profileModel.registrationProfileData.groupCode;
       if (groupCode != null && _group == null) {
         _currentWeek = 0;
         _group = groupCode;
@@ -58,9 +59,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     if (currentState is SchedulePending) return;
     switch (method) {
       case 'nextWeek':
-          _currentWeek += 1;
+        _currentWeek += 1;
       case 'previousWeek':
-          _currentWeek -= 1;
+        _currentWeek -= 1;
     }
     print('_currentWeek: $_currentWeek');
     if (_history.containsKey(_currentWeek)) {
@@ -75,7 +76,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   void _getWeek() {
-    context.read<ScheduleBloc>().add(ScheduleGetWeek(weekOffset: _currentWeek, group: _group!));
+    context.read<ScheduleBloc>().add(
+      ScheduleGetWeek(weekOffset: _currentWeek, group: _group!),
+    );
   }
 
   List<DateTime> _getWeekDays() {
@@ -92,7 +95,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          final groupCode = state.profileModel.registrationProfileData.groupCode;
+          final groupCode =
+              state.profileModel.registrationProfileData.groupCode;
           if (groupCode != null) {
             _group = groupCode;
             _currentWeek = 0;
@@ -112,19 +116,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         },
         builder: (context, state) {
           return SafeArea(
-          child: Column(
-            children: [
-              _buildWeekHeader(),
-              if (_group == null && state is ScheduleInitial) Center(
-                child: Text('Укажите группу в профиле'),),
-              if (state is SchedulePending) Center(
-                child: CircularProgressIndicator(),),
-              if (state is ScheduleHasWeek && _weekScheduleModel != null) _buildScheduleToday(),
-              if (state is ScheduleError) Text(state.error.toString()),
-            ],
-          ),
-        );
-        }
+            child: Column(
+              children: [
+                _buildWeekHeader(),
+                if (_group == null && state is ScheduleInitial)
+                  Center(child: Text('Укажите группу в профиле')),
+                if (state is SchedulePending)
+                  Center(child: CircularProgressIndicator()),
+                if (state is ScheduleHasWeek && _weekScheduleModel != null)
+                  _buildScheduleToday(),
+                if (state is ScheduleError) Text(state.error.toString()),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -219,10 +224,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: circleColor,
-                border: Border.all(
-                  color: circleBorder,
-                  width: 1.5,
-                ),
+                border: Border.all(color: circleBorder, width: 1.5),
               ),
               child: Center(
                 child: Text(
@@ -331,20 +333,22 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     for (int i = 0; i < groups.length - 1; i++) {
       final currentEnd = _parseTime(groups[i].endTime);
-      final nextStart  = _parseTime(groups[i + 1].startTime);
-      final minutes    = nextStart.difference(currentEnd).inMinutes;
+      final nextStart = _parseTime(groups[i + 1].startTime);
+      final minutes = nextStart.difference(currentEnd).inMinutes;
 
       if (minutes <= 0) continue;
 
-      breaks.add(BreakModel(
-        type: _defineBreakType(
-          startTime: currentEnd,
-          endTime: nextStart,
-          durationMinutes: minutes,
+      breaks.add(
+        BreakModel(
+          type: _defineBreakType(
+            startTime: currentEnd,
+            endTime: nextStart,
+            durationMinutes: minutes,
+          ),
+          startTime: groups[i].endTime,
+          endTime: groups[i + 1].startTime,
         ),
-        startTime: groups[i].endTime,
-        endTime: groups[i + 1].startTime,
-      ));
+      );
     }
 
     return breaks;
@@ -356,7 +360,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     return Container(
       decoration: BoxDecoration(
-
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withOpacity(0.2), width: 1),
       ),
@@ -381,7 +384,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         // Бейдж типа занятия
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4,
+                            horizontal: 10,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.12),
@@ -514,11 +518,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
             child: Row(
               children: [
-                Icon(
-                  Icons.call_split_rounded,
-                  size: 15,
-                  color: groupColor,
-                ),
+                Icon(Icons.call_split_rounded, size: 15, color: groupColor),
                 const SizedBox(width: 6),
                 Text(
                   'Параллельные занятия',
@@ -574,12 +574,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               // Тип
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: color.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                      color: color.withOpacity(0.35)),
+                                    color: color.withOpacity(0.35),
+                                  ),
                                 ),
                                 child: Text(
                                   lesson.lessonType.displayName,
@@ -604,9 +607,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               // Преподаватель
                               Row(
                                 children: [
-                                  Icon(Icons.person_outline_rounded,
-                                      size: 13,
-                                      color: color.withOpacity(0.7)),
+                                  Icon(
+                                    Icons.person_outline_rounded,
+                                    size: 13,
+                                    color: color.withOpacity(0.7),
+                                  ),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
@@ -623,9 +628,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               // Аудитория
                               Row(
                                 children: [
-                                  Icon(Icons.room_outlined,
-                                      size: 13,
-                                      color: color.withOpacity(0.7)),
+                                  Icon(
+                                    Icons.room_outlined,
+                                    size: 13,
+                                    color: color.withOpacity(0.7),
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     lesson.classroom,
@@ -644,10 +651,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ),
                 ),
                 if (i < group.lessons.length - 1)
-                  Divider(
-                    color: groupColor,
-                    height: 1,
-                  ),
+                  Divider(color: groupColor, height: 1),
               ],
             );
           }),
@@ -662,10 +666,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     required int durationMinutes,
   }) {
     // Промежуток обеда: 12:00 - 15:00
-    final lunchStart = DateTime(startTime.year, startTime.month, startTime.day, 12, 0);
-    final lunchEnd = DateTime(startTime.year, startTime.month, startTime.day, 15, 0);
+    final lunchStart = DateTime(
+      startTime.year,
+      startTime.month,
+      startTime.day,
+      12,
+      0,
+    );
+    final lunchEnd = DateTime(
+      startTime.year,
+      startTime.month,
+      startTime.day,
+      15,
+      0,
+    );
 
-    final overlapsLunch = startTime.isBefore(lunchEnd) && endTime.isAfter(lunchStart);
+    final overlapsLunch =
+        startTime.isBefore(lunchEnd) && endTime.isAfter(lunchStart);
 
     if (durationMinutes > 20 && overlapsLunch) {
       return BreakType.lunch;
@@ -677,25 +694,29 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildBreakCard(BreakModel breakModel) {
-    final (Color bgColor, Color borderColor, Color iconColor, IconData icon) =
-    switch (breakModel.type) {
+    final (
+      Color bgColor,
+      Color borderColor,
+      Color iconColor,
+      IconData icon,
+    ) = switch (breakModel.type) {
       BreakType.lunch => (
-      Colors.orange.withOpacity(0.07),
-      Colors.orange.withOpacity(0.3),
-      Colors.orange.shade700,
-      Icons.restaurant_rounded,
+        Colors.orange.withOpacity(0.07),
+        Colors.orange.withOpacity(0.3),
+        Colors.orange.shade700,
+        Icons.restaurant_rounded,
       ),
       BreakType.window => (
-      Colors.purple.withOpacity(0.07),
-      Colors.purple.withOpacity(0.3),
-      Colors.purple.shade700,
-      Icons.access_time_rounded,
+        Colors.purple.withOpacity(0.07),
+        Colors.purple.withOpacity(0.3),
+        Colors.purple.shade700,
+        Icons.access_time_rounded,
       ),
       BreakType.rest => (
-      Colors.blue.withOpacity(0.07),
-      Colors.blue.withOpacity(0.3),
-      Colors.blue.shade700,
-      Icons.coffee_rounded,
+        Colors.blue.withOpacity(0.07),
+        Colors.blue.withOpacity(0.3),
+        Colors.blue.shade700,
+        Icons.coffee_rounded,
       ),
     };
 
@@ -736,10 +757,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               const SizedBox(height: 2),
               Text(
                 '${breakModel.startTime} – ${breakModel.endTime} · $duration мин',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               ),
             ],
           ),
@@ -765,12 +783,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         same.add(lessons[i]);
       }
 
-      groups.add(LessonGroupModel(
-        startTime: current.startTime,
-        endTime: current.endTime,
-        numberPair: current.numberPair,
-        lessons: same,
-      ));
+      groups.add(
+        LessonGroupModel(
+          startTime: current.startTime,
+          endTime: current.endTime,
+          numberPair: current.numberPair,
+          lessons: same,
+        ),
+      );
       i++;
     }
 

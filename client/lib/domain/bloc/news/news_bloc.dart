@@ -8,9 +8,9 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsRepository _repository;
   List<NewsModel>? _lastNewsList;
 
-  NewsBloc({
-    required NewsRepository newsRepository,
-  }) : _repository = newsRepository, super(NewsInitial()) {
+  NewsBloc({required NewsRepository newsRepository})
+    : _repository = newsRepository,
+      super(NewsInitial()) {
     on<FetchNews>(_onFetchNews);
     on<CreateNews>(_onCreateNews);
     on<DeleteNews>(_onDeleteNews);
@@ -23,12 +23,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       _lastNewsList = newsList;
       emit(NewsLoaded(newsList));
     } catch (e) {
-      emit(
-        NewsError(
-          message: e.toString(),
-          previousNewsList: _lastNewsList,
-        ),
-      );
+      emit(NewsError(message: e.toString(), previousNewsList: _lastNewsList));
     }
   }
 
@@ -42,12 +37,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       emit(NewsCreateSuccess());
       add(FetchNews());
     } catch (e) {
-      emit(
-        NewsError(
-          message: e.toString(),
-          previousNewsList: _lastNewsList,
-        ),
-      );
+      emit(NewsError(message: e.toString(), previousNewsList: _lastNewsList));
     }
   }
 
@@ -57,12 +47,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       emit(NewsDeleteSuccess());
       add(FetchNews());
     } catch (e) {
-      emit(
-        NewsError(
-          message: e.toString(),
-          previousNewsList: _lastNewsList,
-        ),
-      );
+      emit(NewsError(message: e.toString(), previousNewsList: _lastNewsList));
     }
   }
 }

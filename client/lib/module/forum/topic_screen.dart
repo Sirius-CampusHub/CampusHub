@@ -28,15 +28,15 @@ class TopicScreen extends StatelessWidget {
             Expanded(child: _TopicView(topicId: topicId)),
             Builder(
               builder: (context) => _CommentInputField(
-                  onSubmit: (content) {
-                    context.read<TopicBloc>().add(
-                      TopicCreateCommentRequested(
-                        content: content,
-                        topicId: topicId,
-                      ),
-                    );
-                  },
-                )
+                onSubmit: (content) {
+                  context.read<TopicBloc>().add(
+                    TopicCreateCommentRequested(
+                      content: content,
+                      topicId: topicId,
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -98,7 +98,13 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
-                buildCounter: (context, {required currentLength, required maxLength, required isFocused}) => null,
+                buildCounter:
+                    (
+                      context, {
+                      required currentLength,
+                      required maxLength,
+                      required isFocused,
+                    }) => null,
               ),
             ),
             const SizedBox(width: 8),
@@ -148,9 +154,7 @@ class _TopicView extends StatelessWidget {
                 (state) => state is TopicLoaded || state is TopicError,
               );
 
-              topicBloc.add(
-                TopicLoadRequested(topicId: topicId),
-              );
+              topicBloc.add(TopicLoadRequested(topicId: topicId));
 
               await refreshCompleted;
             },

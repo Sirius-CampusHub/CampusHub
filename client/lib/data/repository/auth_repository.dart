@@ -15,14 +15,17 @@ class AuthRepository {
     required FirebaseAuthDataSource authDataSource,
     required UserFirestoreDataSource firestoreDataSource,
     required Dio dio,
-  })  : _authDataSource = authDataSource,
-        _firestoreDataSource = firestoreDataSource,
-        _dio = dio;
+  }) : _authDataSource = authDataSource,
+       _firestoreDataSource = firestoreDataSource,
+       _dio = dio;
 
   Stream<UserModel?> get userStream {
     return _authDataSource.authStateChanges.asyncMap((firebaseUser) async {
       if (firebaseUser == null) return null;
-      return await _fetchUserOrCreateDefault(firebaseUser.uid, firebaseUser.email);
+      return await _fetchUserOrCreateDefault(
+        firebaseUser.uid,
+        firebaseUser.email,
+      );
     });
   }
 
@@ -34,15 +37,21 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    final firebaseUser =
-        await _authDataSource.signUp(email: email, password: password);
+    final firebaseUser = await _authDataSource.signUp(
+      email: email,
+      password: password,
+    );
     RegistrationDraftStorage.memoryPendingUid = firebaseUser.uid;
   }
 
-  Future<UserModel> completeRegistration(RegistrationProfileData profile) async {
+  Future<UserModel> completeRegistration(
+    RegistrationProfileData profile,
+  ) async {
     try {
       final email = _authDataSource.currentUser?.email ?? '';
-      await _authDataSource.setUserDisplayName(profile.displayName == null ? '' : profile.displayName!.trim());
+      await _authDataSource.setUserDisplayName(
+        profile.displayName == null ? '' : profile.displayName!.trim(),
+      );
 
       final rawToken = await _authDataSource.getToken(forceRefresh: true);
       if (rawToken == null) {
@@ -79,7 +88,11 @@ class AuthRepository {
       try {
         await _dio.patch(
           'profile/avatar',
-          data: {'avatar_emoji': profile.avatarEmoji != null ? profile.avatarEmoji!.trim() : '😀'},
+          data: {
+            'avatar_emoji': profile.avatarEmoji != null
+                ? profile.avatarEmoji!.trim()
+                : '😀',
+          },
           options: authOptions,
         );
       } on DioException catch (dioError) {
@@ -119,9 +132,7 @@ class AuthRepository {
 
   Map<String, dynamic> _profileUpdateJson(RegistrationProfileData p) {
     final displayName = p.displayName == null ? '' : p.displayName!.trim();
-    final map = <String, dynamic>{
-      'display_name': displayName,
-    };
+    final map = <String, dynamic>{'display_name': displayName};
     final group = p.groupCode?.trim();
     if (group != null && group.isNotEmpty) {
       map['group_code'] = group;
@@ -159,19 +170,23 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    final firebaseUser =
-        await _authDataSource.signIn(email: email, password: password);
+    final firebaseUser = await _authDataSource.signIn(
+      email: email,
+      password: password,
+    );
     final auth = await _fetchUserOrCreateDefault(
       firebaseUser.uid,
       firebaseUser.email,
     );
 
     final model = await getProfileData();
-    final authModel =
-        ProfileModel(registrationProfileData: model, userModel: auth);
+    final authModel = ProfileModel(
+      registrationProfileData: model,
+      userModel: auth,
+    );
     return authModel;
-      // String? token = await _authDataSource.getToken(forceRefresh: true);
-      // print("Bearer "+ token.toString());
+    // String? token = await _authDataSource.getToken(forceRefresh: true);
+    // print("Bearer "+ token.toString());
   }
 
   Future<void> signOut() async {
@@ -195,9 +210,7 @@ class AuthRepository {
       try {
         final response = await _dio.get(
           'profile/me',
-          options: Options(
-            headers: {'Authorization': 'Bearer $token'},
-          ),
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
 
         final data = response.data;
@@ -205,8 +218,7 @@ class AuthRepository {
         // TODO убрать
         print(data);
         if (data is! Map<String, dynamic>) {
-          throw Exception(
-              'Неправильный формат response при логине.');
+          throw Exception('Неправильный формат response при логине.');
         }
 
         final model = RegistrationProfileData.fromJson(data);
@@ -228,9 +240,7 @@ class AuthRepository {
     final token = await _authDataSource.getToken(forceRefresh: true);
     if (token == null) throw Exception('No token');
 
-    final authOptions = Options(
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final authOptions = Options(headers: {'Authorization': 'Bearer $token'});
 
     try {
       await _dio.put(
@@ -270,9 +280,7 @@ class AuthRepository {
     try {
       final response = await _dio.get(
         'profile/me',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       final data = response.data;
@@ -307,10 +315,6 @@ class AuthRepository {
       return userModel;
     }
 
-    return UserModel(
-      id: uid,
-      email: email ?? '',
-      role: UserRole.student,
-    );
+    return UserModel(id: uid, email: email ?? '', role: UserRole.student);
   }
 }
