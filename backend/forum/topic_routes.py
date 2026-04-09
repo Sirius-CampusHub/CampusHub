@@ -49,9 +49,7 @@ async def get_comments(
                 "content": comment.content,
                 "comment_id": comment.id,
                 "author": (
-                    "anon"
-                    if topic.anon or comment_author is None
-                    else comment_author.display_name
+                    "" if topic.anon or comment_author is None else comment_author.id
                 ),
             }
         )
@@ -85,5 +83,5 @@ async def create_comment(
     return {
         "content": new_comment.content,
         "comment_id": new_comment.id,
-        "author": "anon" if topic.anon or author is None else author.display_name,
+        "author": "" if topic.anon or author is None else author.id,
     }
