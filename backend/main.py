@@ -29,11 +29,11 @@ def init_firebase():
 
 init_firebase()
 
-from schedule import router as schedule_router
-from schedule import routes
-from auth import auth_routes
-from news import news_routes
-from profiles import router as profile_router
+import schedule
+import auth
+import news
+import profiles
+import forum
 
 os.makedirs("uploads", exist_ok=True)
 
@@ -52,8 +52,9 @@ app = fastapi.FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="uploads"), name="static")
-app.include_router(schedule_router)
-app.include_router(auth_routes.router)
-app.include_router(profile_router)
-app.include_router(news_routes.router)
-app.include_router(routes.router)
+app.include_router(auth.router)
+app.include_router(profiles.router)
+app.include_router(news.router)
+app.include_router(schedule.router)
+app.include_router(forum.forum_router)
+app.include_router(forum.topic_router)
