@@ -17,37 +17,38 @@ forum_router = APIRouter(
 
 
 @forum_router.get("/topics", response_model=List[TopicScheme])
-async def get_all_news(
+async def get_topics(
         user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(Topics))
-    topics = result.scalars().all()
+    result = await db.execute(
+        select(Topics, func.count(Comments.id).label("comment_count"))
+        .outerjoin(Comments, Comments.topic_id == Topics.id)
+        .group_by(Topics.id)
+    )
+    rows = result.all()
 
-    # Подсчитываем комментарии для каждого топика
-    topics_with_counts = []
-    for topic in topics:
-        comment_count_result = await db.execute(
-            select(func.count(Comments.id)).where(Comments.topic_id == topic.id)
-        )
-        comment_count = comment_count_result.scalar() or 0
-
-        topics_with_counts.append({
+    return [
+        {
             "title": topic.title,
             "topic_id": topic.id,
-            "responses_count": comment_count
-        })
-
-    return topics_with_counts
+            "responses_count": count,
+            "anon": topic.anon
+        }
+        for topic, count in rows
+    ]
 
 
 @forum_router.post("/topics", response_model=TopicScheme)
 async def create_topic(
         request: CreateTopicRequest,
-        user: dict = Depends(get_current_user),
+        user: dict = Depends(require_council_role),
         db: AsyncSession = Depends(get_db)
 ):
-    new_topic = Topics(title=request.title)
+    title = request.title.strip()
+    if not 1 < len(title) < 50:
+        raise HTTPException(status_code=400, detail="Title is invalid")
+    new_topic = Topics(title=title, anon=request.anon)
     db.add(new_topic)
     await db.commit()
     await db.refresh(new_topic)
@@ -55,5 +56,6 @@ async def create_topic(
     return {
         "title": new_topic.title,
         "topic_id": new_topic.id,
-        "responses_count": 0
+        "responses_count": 0,
+        "anon": new_topic.anon
     }

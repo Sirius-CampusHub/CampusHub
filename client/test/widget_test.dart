@@ -1,13 +1,18 @@
-import 'package:client/core/dependencies.dart';
-import 'package:client/main.dart';
-import 'package:client/module/profile/profile_screen.dart';
-import 'package:client/network/http_client.dart';
+import 'package:client/module/widgets/button_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('Старт на вкладке Профиль', (WidgetTester tester) async {
-    await tester.pumpAndSettle();
+  test('ButtonNotifier hides on downward scroll and shows on upward', () {
+    final notifier = ButtonNotifier();
+    final values = <bool>[notifier.value];
 
-    expect(find.byType(ProfileScreen), findsOneWidget);
+    notifier.addListener(() {
+      values.add(notifier.value);
+    });
+
+    notifier.updateOnScroll(20);
+    notifier.updateOnScroll(10);
+
+    expect(values, <bool>[true, false, true]);
   });
 }
