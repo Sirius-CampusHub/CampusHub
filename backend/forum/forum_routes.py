@@ -21,24 +21,21 @@ async def get_topics(
         user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(Topics))
-    topics = result.scalars().all()
+    result = await db.execute(
+        select(Topics, func.count(Comments.id).label("comment_count"))
+        .outerjoin(Comments, Comments.topic_id == Topics.id)
+        .group_by(Topics.id)
+    )
+    rows = result.all()
 
-    # Подсчитываем комментарии для каждого топика
-    topics_with_counts = []
-    for topic in topics:
-        comment_count_result = await db.execute(
-            select(func.count(Comments.id)).where(Comments.topic_id == topic.id)
-        )
-        comment_count = comment_count_result.scalar() or 0
-
-        topics_with_counts.append({
+    return [
+        {
             "title": topic.title,
             "topic_id": topic.id,
-            "responses_count": comment_count
-        })
-
-    return topics_with_counts
+            "responses_count": count,
+        }
+        for topic, count in rows
+    ]
 
 
 @forum_router.post("/topics", response_model=TopicScheme)
