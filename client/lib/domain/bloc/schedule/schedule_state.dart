@@ -13,7 +13,7 @@ class SchedulePending extends ScheduleState {}
 class ScheduleInitial extends ScheduleState {}
 
 class ScheduleError extends ScheduleState {
-  final Exception error;
+  final String error;
 
   ScheduleError({required this.error});
 }

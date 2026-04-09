@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class LessonModel {
   final int numberPair;
   final String name;
@@ -19,16 +21,24 @@ class LessonModel {
 
   factory LessonModel.fromJson(Map<String, dynamic> json){
     return LessonModel(
-      name: json['teachers']['fio'],
-      classroom: json['classroom'],
-      lessonType: json['group_type'] ?? LessonType.fromString(json['group_type']),
+      name: json['teachers'][0]['fio'] ?? 'Неизвестный преподаватель',
+      classroom: json['classroom'] ?? 'Универ',
+      lessonType: _parseLessonType(json['group_type']),
       endTime: json['end_time'],
       startTime: json['start_time'],
       discipline: json['discipline'],
-      numberPair: json['number_pair'],
+      numberPair: json['number_pair'] ?? 0,
     );
   }
+
+  static LessonType _parseLessonType(dynamic groupType) {
+    if (groupType == null) return LessonType.other;
+
+    final typeStr = groupType.toString();
+    return LessonType.fromString(typeStr) ?? LessonType.other;
+  }
 }
+
 
 enum LessonType {
   lecture('Лекции'),
@@ -48,3 +58,22 @@ enum LessonType {
           .firstOrNull;
 }
 
+extension LessonTypeStyle on LessonType {
+  Color get color => switch (this) {
+    LessonType.lecture  => const Color(0xFF2E7D32),
+    LessonType.seminar  => const Color(0xFFE65100),
+    LessonType.practise => const Color(0xFF1565C0),
+    LessonType.lab      => const Color(0xFF6A1B9A),
+    LessonType.exam     => const Color(0xFFC62828),
+    LessonType.other    => const Color(0xFF37474F),
+  };
+
+  String get displayName => switch (this) {
+    LessonType.lecture  => 'Лекция',
+    LessonType.seminar  => 'Семинар',
+    LessonType.practise => 'Практика',
+    LessonType.lab      => 'Лабораторная',
+    LessonType.exam     => 'Экзамен',
+    LessonType.other    => 'Прочее',
+  };
+}

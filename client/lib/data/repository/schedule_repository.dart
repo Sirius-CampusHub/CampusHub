@@ -16,6 +16,7 @@ class ScheduleRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
+        if (data.isEmpty) throw Exception('Такой группы не существует.');
         return WeekScheduleModel.fromJson(data);
       } else if (response.statusCode == 422) {
         throw Exception('Неправильный запрос: ${response.data['detail']['msg']}');
@@ -34,7 +35,8 @@ class ScheduleRepository {
 
   String _createLink(List<Object> args) {
     String link = '${ApiConfig.baseUrl}/${_url}/?';
-    args.forEach((e) {link += e == args.last ? '$e' : "${e}&";});
+    link = link + 'group=${args[0]}' + "&" + "week_offset=${args[1]}";
+    print(link);
     return link;
   }
 }
