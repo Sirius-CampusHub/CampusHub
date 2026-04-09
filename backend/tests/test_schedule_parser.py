@@ -62,3 +62,27 @@ def test_normalize_response_groups_days_and_sorts_events():
     assert days[0]["date"] == "02.01.2025"
     assert days[1]["date"] == "03.01.2025"
     assert [event["discipline"] for event in days[1]["events"]] == ["Biology", "Math"]
+
+
+def test_normalize_response_skips_items_without_date():
+    client = SiriusScheduleClient()
+    data = {
+        "events": {
+            "one": [
+                {"date": "", "startTime": "10:00", "discipline": "Broken"},
+                {"dayWeek": "Tue", "startTime": "09:00", "discipline": "Broken 2"},
+            ]
+        }
+    }
+
+    days = client._normalize_response("GROUP-1", 0, data)
+    assert days == []
+
+
+def test_parse_date_and_time_return_min_for_invalid_values():
+    client = SiriusScheduleClient()
+
+    assert client._parse_date("wrong-date").year == 1
+    assert client._parse_date(None).year == 1
+    assert client._parse_time("99:99").year == 1
+    assert client._parse_time(None).year == 1

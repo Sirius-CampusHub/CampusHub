@@ -1,3 +1,6 @@
+import pytest
+from pydantic import ValidationError
+
 from schedule.models import Event
 
 
@@ -47,3 +50,41 @@ def test_event_keeps_teacher_dicts():
 
     assert len(event.teachers) == 1
     assert event.teachers[0].fio == "Иванов Иван"
+
+
+def test_event_with_empty_or_invalid_teachers_becomes_empty_list():
+    with_empty = Event(
+        start_time="09:00",
+        end_time="10:30",
+        number_pair=1,
+        discipline="Math",
+        group_type=None,
+        address=None,
+        classroom=None,
+        comment=None,
+        place=None,
+        url_online=None,
+        group="GROUP-1",
+        code="MATH",
+        color=None,
+        teachers=[],
+    )
+    assert with_empty.teachers == []
+
+    with pytest.raises(ValidationError):
+        Event(
+            start_time="09:00",
+            end_time="10:30",
+            number_pair=1,
+            discipline="Math",
+            group_type=None,
+            address=None,
+            classroom=None,
+            comment=None,
+            place=None,
+            url_online=None,
+            group="GROUP-1",
+            code="MATH",
+            color=None,
+            teachers=[123],
+        )
