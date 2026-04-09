@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from database.database import engine, Base
+from database import models
+
 import firebase_admin
 from firebase_admin import credentials
 
@@ -26,21 +29,20 @@ def init_firebase():
 
 init_firebase()
 
-import schedule
-import auth
-import news
-import profiles
-import forum
+from schedule import router as schedule_router
+from schedule import routes
+from auth import auth_routes
+from news import news_routes
+from profiles import router as profile_router
 
 os.makedirs("uploads", exist_ok=True)
 
-
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI):
+    print("Инициализация таблиц БД...")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-    print("База данных готова (таблицы созданы/проверены)")
+    print("БД готова!")
     yield
 
 app = fastapi.FastAPI(
@@ -49,11 +51,9 @@ app = fastapi.FastAPI(
     lifespan=lifespan
 )
 
-
 app.mount("/static", StaticFiles(directory="uploads"), name="static")
-app.include_router(auth.router)
-app.include_router(profiles.router)
-app.include_router(news.router)
-app.include_router(schedule.router)
-app.include_router(forum.forum_router)
-app.include_router(forum.topic_router)
+app.include_router(schedule_router)
+app.include_router(auth_routes.router)
+app.include_router(profile_router)
+app.include_router(news_routes.router)
+app.include_router(routes.router)
