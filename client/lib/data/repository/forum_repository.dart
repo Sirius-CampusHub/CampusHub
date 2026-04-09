@@ -16,25 +16,25 @@ class ForumRepository {
     const TopicModel(
       id: '1',
       title: 'Как начать изучать Flutter в 2026?',
-      author: 'Alex',
       repliesCount: 42,
+      isAnonymous: false,
     ),
     const TopicModel(
       id: '2',
       title: 'Где найти хорошую архитектуру?',
-      author: 'Bob',
       repliesCount: 15,
+      isAnonymous: false,
     ),
     const TopicModel(
       id: '3',
       title: 'Помогите с ошибкой Provider / BLoC',
-      author: 'Charlie',
       repliesCount: 3,
+      isAnonymous: false,
     ),
   ];
 
   Future<List<TopicModel>> getTopics() async {
-    return List.from(_mockTopics);
+    // return List.from(_mockTopics);
     try {
       final rawToken = await _authDataSource.getToken();
       if (rawToken == null) {
@@ -49,55 +49,67 @@ class ForumRepository {
           },
         ),
       );
+      print('=== RESPONSE DATA TYPE: ${response.data.runtimeType}');
+      print('=== RESPONSE DATA: ${response.data}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        return data.map((json) => TopicModel.fromJson(json)).toList();
+        return data
+            .map(
+              (json) => TopicModel.fromJson(
+                Map<String, dynamic>.from(json as Map),
+              ),
+            )
+            .toList();
       } else {
         throw Exception("Не удалось загрузить топики");
       }
     } on DioException catch (e) {
       throw Exception("Ошибка сети при загрузке топиков: ${e.message}");
-    }
+    }   catch (e) {
+     throw Exception("Неизвестная ошибка: $e");
+  }
   }
 
-  Future<void> createTopic(String title) async {
-    _mockTopics.insert(
-      0,
-      TopicModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: title,
-        author: 'Текущий Пользователь',
-        repliesCount: 0,
-      ),
-    );
 
-    // try {
-    //   final rawToken = await _authDataSource.getToken();
-    //   if (rawToken == null) {
-    //     await _authDataSource.deleteCurrentUser();
-    //     throw Exception('Не удалось получить токен после регистрации');
-    //   }
-    //   final formData = FormData.fromMap({
-    //     "title": title,
-    //   });
-    //
-    //   await _dio.post(
-    //     '/forum/topics/',
-    //     data: formData,
-    //     options: Options(
-    //       headers: {
-    //         'Authorization': 'Bearer $rawToken',
-    //       },
-    //     ),
-    //   );
-    //
-    // } on DioException catch (e) {
-    //   if (e.response?.statusCode == 403) {
-    //     throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
-    //   }
-    //   final errorDetail = e.response?.data?['detail'] ?? e.message;
-    //   throw Exception("Ошибка создания топика: $errorDetail");
-    // }
+  Future<void> createTopic(String title, bool isAnonymous) async {
+    try {
+      final rawToken = await _authDataSource.getToken();
+      if (rawToken == null) {
+        await _authDataSource.deleteCurrentUser();
+        throw Exception('Не удалось получить токен после регистрации');
+      }
+      final formData = {
+        'title': title,
+        // backend seems to use `anon`
+        'anon': isAnonymous,
+        // keep for backwards compatibility if backend also supports it
+        'is_anonymous': isAnonymous,
+      };
+
+      print('=== SENDING POST to /forum/topics with data: $formData');
+      final response = await _dio.post(
+        '/forum/topics',
+        data: formData,
+        options: Options(
+          headers: {'Authorization': 'Bearer $rawToken'},
+        ),
+      );
+      print('=== CREATE TOPIC RESPONSE status: ${response.statusCode}');
+      print('=== CREATE TOPIC RESPONSE data type: ${response.data.runtimeType}');
+      print('=== CREATE TOPIC RESPONSE data: ${response.data}');
+    } on DioException catch (e) {
+      print('=== DIO EXCEPTION: ${e.message}');
+      print('=== RESPONSE status: ${e.response?.statusCode}');
+      print('=== RESPONSE data type: ${e.response?.data.runtimeType}');
+      print('=== RESPONSE data: ${e.response?.data}');
+      if (e.response?.statusCode == 403) {
+        throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
+      }
+      final data = e.response?.data;
+      final errorDetail =
+          (data is Map ? data['detail'] : data)?.toString() ?? e.message;
+      throw Exception("Ошибка создания топика: $errorDetail");
+    }
   }
 }

@@ -2,7 +2,7 @@ class CommentModel {
   final String id;
   final String author;
   final String content;
-  final String topicId;
+  final String topicId; // не отдают с бека
 
   const CommentModel({
     required this.id,
@@ -12,11 +12,16 @@ class CommentModel {
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
+    final authorRaw = json['author'] ?? json['author_name'] ?? json['authorName'];
+    final contentRaw = json['content'] ?? json['text'];
+    final topicIdRaw = json['topicId'] ?? json['topic_id'] ?? json['topicID'];
+
+
     return CommentModel(
-      id: json['id'] as String,
-      author: json['author'] as String,
-      content: json['content'] as String,
-      topicId: json['topicId'] as String,
+      id: (json['id'] ?? json['comment_id'])?.toString() ?? '',
+      author: (authorRaw as String?)?.trim() ?? '',
+      content: (contentRaw as String?)?.trim() ?? '',
+      topicId: topicIdRaw?.toString() ?? '',
     );
   }
 }

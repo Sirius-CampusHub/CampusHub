@@ -24,13 +24,15 @@ class NewsModel {
   }
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
+    final createdAtRaw = json['created_at'];
     return NewsModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      content: json['content'] as String,
-      imageUrl: json['image_url'] as String?,
-      authorId: json['author_id'] as String,
-      createdAt: DateTime.parse(json['created_at']).toUtc(),
+      id: (json['id'])?.toString() ?? '',
+      title: (json['title'] as String?)?.trim() ?? '',
+      content: (json['content'] as String?)?.trim() ?? '',
+      imageUrl: (json['image_url'] as String?)?.trim(),
+      authorId: (json['author_id'])?.toString() ?? '',
+      createdAt: DateTime.tryParse(createdAtRaw?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 }
