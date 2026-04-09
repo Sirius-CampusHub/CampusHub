@@ -6,7 +6,7 @@ from sqlalchemy.future import select
 
 from auth.auth_routes import get_current_user
 from .schemas import Comment as CommentScheme, CreateCommentRequest
-from database.models import Comments, User
+from database.models import Comments, User, Topics
 from database.database import get_db
 
 topic_router = APIRouter(
@@ -17,6 +17,11 @@ topic_router = APIRouter(
 
 async def _get_db_user(db: AsyncSession, uid: str) -> User | None:
     result = await db.execute(select(User).where(User.id == uid))
+    return result.scalar_one_or_none()
+
+
+async def _get_db_topic(db: AsyncSession, uid: str) -> Topics | None:
+    result = await db.execute(select(Topics).where(Topics.id == uid))
     return result.scalar_one_or_none()
 
 
@@ -48,18 +53,18 @@ async def create_comment(
         db: AsyncSession = Depends(get_db)
 ):
     content = request.content.strip()
-    anon = request.get("anon", False)
     if not 1 < len(content) < 200:
         raise HTTPException(status_code=400, detail="Comment content is invalid")
-    new_comment = Comments(content=content, topic_id=request.topic_id, user_id=user.get("uid"), anon=anon)
+    new_comment = Comments(content=content, topic_id=request.topic_id, user_id=user.get("uid"))
     db.add(new_comment)
     await db.commit()
     await db.refresh(new_comment)
 
     author = await _get_db_user(db, new_comment.user_id)
+    topic = await _get_db_topic(db, new_comment.topic_id)
 
     return {
         "content": new_comment.content,
         "comment_id": new_comment.id,
-        "author": "anon" if author is None or anon else author.display_name
+        "author": "anon" if author is None or topic.anon else author.display_name,
     }

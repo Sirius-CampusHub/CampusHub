@@ -51,6 +51,7 @@ class Topics(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     title = Column(String(50), nullable=False)
+    anon = Column(Boolean, nullable=False, default=False)
 
 
 class Comments(Base):
@@ -59,6 +60,5 @@ class Comments(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     topic_id = Column(String, nullable=False, index=True)
     user_id = Column(String, nullable=False)
-    anon = Column(Boolean, nullable=False, default=False)
     content = Column(String(200), nullable=False)
     created_at = Column(DateTime, default=_utc_now_naive)

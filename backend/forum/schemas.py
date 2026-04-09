@@ -11,6 +11,7 @@ class Topics(BaseModel):
 
 class CreateTopicRequest(BaseModel):
     title: str
+    anon: bool
 
 class CreateCommentRequest(BaseModel):
     content: str

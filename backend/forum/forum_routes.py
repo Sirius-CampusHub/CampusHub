@@ -33,6 +33,7 @@ async def get_topics(
             "title": topic.title,
             "topic_id": topic.id,
             "responses_count": count,
+            "anon": topic.anon
         }
         for topic, count in rows
     ]
@@ -47,7 +48,7 @@ async def create_topic(
     title = request.title.strip()
     if not 1 < len(title) < 50:
         raise HTTPException(status_code=400, detail="Title is invalid")
-    new_topic = Topics(title=title)
+    new_topic = Topics(title=title, anon=request.anon)
     db.add(new_topic)
     await db.commit()
     await db.refresh(new_topic)
@@ -55,5 +56,6 @@ async def create_topic(
     return {
         "title": new_topic.title,
         "topic_id": new_topic.id,
-        "responses_count": 0
+        "responses_count": 0,
+        "anon": new_topic.anon
     }
