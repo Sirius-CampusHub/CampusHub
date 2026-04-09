@@ -35,7 +35,7 @@ async def get_comments(
         comments_schemas.append({
             "content": comment.content,
             "comment_id": comment.id,
-            "author": "anon" if comment_author is None else comment_author.display_name
+            "author": "anon" if comment_author is None or comment.anon else comment_author.display_name
         })
 
     return comments_schemas
@@ -48,9 +48,10 @@ async def create_comment(
         db: AsyncSession = Depends(get_db)
 ):
     content = request.content.strip()
+    anon = request.get("anon", False)
     if not 1 < len(content) < 200:
         raise HTTPException(status_code=400, detail="Comment content is invalid")
-    new_comment = Comments(content=content, topic_id=request.topic_id, user_id=author.get("uid"))
+    new_comment = Comments(content=content, topic_id=request.topic_id, user_id=user.get("uid"), anon=anon)
     db.add(new_comment)
     await db.commit()
     await db.refresh(new_comment)
@@ -60,5 +61,5 @@ async def create_comment(
     return {
         "content": new_comment.content,
         "comment_id": new_comment.id,
-        "author": "anon" if author is None else author.display_name
+        "author": "anon" if author is None or anon else author.display_name
     }
