@@ -222,6 +222,47 @@ class AuthRepository {
     }
   }
 
+  Future<RegistrationProfileData> updateProfileData(
+    RegistrationProfileData profile,
+  ) async {
+    final token = await _authDataSource.getToken(forceRefresh: true);
+    if (token == null) throw Exception('No token');
+
+    final authOptions = Options(
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    try {
+      await _dio.put(
+        'profile/update',
+        data: _profileUpdateJson(profile),
+        options: authOptions,
+      );
+    } on DioException catch (dioError) {
+      final errorMessage =
+          _extractApiDetail(dioError) ?? dioError.message ?? 'Ошибка сервера';
+      throw Exception(errorMessage);
+    }
+
+    try {
+      await _dio.patch(
+        'profile/avatar',
+        data: {
+          'avatar_emoji': profile.avatarEmoji != null
+              ? profile.avatarEmoji!.trim()
+              : '😀',
+        },
+        options: authOptions,
+      );
+    } on DioException catch (dioError) {
+      final errorMessage =
+          _extractApiDetail(dioError) ?? dioError.message ?? 'Ошибка сервера';
+      throw Exception(errorMessage);
+    }
+
+    return await getProfileData();
+  }
+
   Future<bool> hasCompletedBackendProfile() async {
     final token = await _authDataSource.getToken(forceRefresh: true);
     if (token == null) return false;
