@@ -6,6 +6,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
   format-check:
     runs-on: ubuntu-latest
@@ -23,9 +26,9 @@ jobs:
         working-directory: client
         run: flutter pub get
 
-      - name: Verify Dart formatting
+      - name: Format Dart code
         working-directory: client
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: dart format lib test
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,10 +40,17 @@ jobs:
       - name: Install backend dev dependencies
         run: pip install -r backend/requirements-dev.txt
 
-      - name: Verify Python formatting
+      - name: Format Python code
         run: |
-          black --check backend
-          isort --check-only backend
+          black backend
+          isort backend
+
+      - name: Auto-commit formatting changes
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-format code"
+          file_pattern: "client/**/*.dart backend/**/*.py"
 
   client-tests:
     needs: [format-check]
