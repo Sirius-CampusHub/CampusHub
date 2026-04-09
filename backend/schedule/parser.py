@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime
 import html
-from http.cookiejar import CookieJar
 import json
 import re
+from dataclasses import dataclass
+from datetime import datetime
+from http.cookiejar import CookieJar
 from typing import Any
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
@@ -57,7 +57,9 @@ class SiriusScheduleClient:
             server_memo=state["serverMemo"],
         )
 
-    def _build_updates(self, component_id: str, group: str, week_offset: int) -> list[dict[str, Any]]:
+    def _build_updates(
+        self, component_id: str, group: str, week_offset: int
+    ) -> list[dict[str, Any]]:
         updates: list[dict[str, Any]] = [
             {
                 "type": "callMethod",
@@ -109,7 +111,9 @@ class SiriusScheduleClient:
         with self._opener.open(req, timeout=30) as response:
             return json.loads(response.read().decode("utf-8"))
 
-    def _normalize_response(self, requested_group: str, week_offset: int, data: dict[str, Any]) -> list[dict[str, Any]]:
+    def _normalize_response(
+        self, requested_group: str, week_offset: int, data: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         raw_events = data.get("events") or {}
         grouped: dict[str, dict[str, Any]] = {}
 
@@ -167,7 +171,9 @@ class SiriusScheduleClient:
                     }
                 )
 
-        days = sorted(grouped.values(), key=lambda item: self._parse_date(item.get("date")))
+        days = sorted(
+            grouped.values(), key=lambda item: self._parse_date(item.get("date"))
+        )
         for day in days:
             day["events"].sort(
                 key=lambda item: (

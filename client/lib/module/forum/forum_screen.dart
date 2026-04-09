@@ -15,7 +15,7 @@ class ForumScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       body: const _ForumView(),
       floatingActionButton: AdminFab(
         onPressed: () => _showCreateTopicModal(context),
@@ -41,10 +41,7 @@ class ForumScreen extends StatelessWidget {
         child: _CreateTopicForm(
           onSubmit: (title, isAnonymous) {
             forumBloc.add(
-              ForumCreateTopicRequested(
-                title: title,
-                isAnonymous: isAnonymous,
-              ),
+              ForumCreateTopicRequested(title: title, isAnonymous: isAnonymous),
             );
             Navigator.pop(modalContext);
           },
@@ -154,11 +151,11 @@ class _ForumView extends StatelessWidget {
                 await forumBloc.stream
                     .firstWhere(
                       (state) => state is ForumLoaded || state is ForumError,
-                  orElse: () => ForumError(error: 'Unknown error'),
-                )
+                      orElse: () => ForumError(error: 'Unknown error'),
+                    )
                     .timeout(const Duration(seconds: 5));
               } catch (e) {
-                  print("Ошибка $e");
+                print("Ошибка $e");
               }
             },
             child: ListView.builder(

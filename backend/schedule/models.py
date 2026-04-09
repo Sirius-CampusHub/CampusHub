@@ -1,5 +1,6 @@
-from pydantic import BaseModel, field_validator
 from typing import List
+
+from pydantic import BaseModel, field_validator
 
 
 class Teacher(BaseModel):
@@ -25,7 +26,7 @@ class Event(BaseModel):
     color: str | None
     teachers: List[Teacher]
 
-    @field_validator('teachers', mode='before')
+    @field_validator("teachers", mode="before")
     @classmethod
     def parse_teachers_strings(cls, value):
         if not isinstance(value, list) or len(value) == 0:
@@ -33,10 +34,10 @@ class Event(BaseModel):
         test_teacher = value[0]
         if isinstance(test_teacher, str):
             result = []
-            teachers = test_teacher.split(',')
+            teachers = test_teacher.split(",")
             for teacher in teachers:
                 teacher = teacher.strip()
-                args = teacher.split(' ')
+                args = teacher.split(" ")
                 if len(args) == 2:
                     last_name, first_name = args
                     middle_name = None
@@ -45,12 +46,14 @@ class Event(BaseModel):
                 else:
                     last_name = teacher
                     first_name, middle_name = None, None
-                result.append({
-                    "fio": teacher.strip(),
-                    "first_name": first_name,
-                    "middle_name": middle_name,
-                    "last_name": last_name
-                })
+                result.append(
+                    {
+                        "fio": teacher.strip(),
+                        "first_name": first_name,
+                        "middle_name": middle_name,
+                        "last_name": last_name,
+                    }
+                )
             return result
         return value
 

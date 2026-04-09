@@ -27,8 +27,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _getProfileData(
-      AuthGetProfileDataRequested event,
-      Emitter<AuthState> emit,) async {
+    AuthGetProfileDataRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     late final usData;
     if (state is AuthAuthenticated) {
       usData = (state as AuthAuthenticated).profileModel;
@@ -38,8 +39,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     emit(AuthLoading());
     try {
-      final RegistrationProfileData regProf = await _authRepository.getProfileData();
-      final user = ProfileModel(registrationProfileData: regProf, userModel: usData.userModel);
+      final RegistrationProfileData regProf = await _authRepository
+          .getProfileData();
+      final user = ProfileModel(
+        registrationProfileData: regProf,
+        userModel: usData.userModel,
+      );
       emit(AuthAuthenticated(profileModel: user));
     } catch (e) {
       print(e.toString());

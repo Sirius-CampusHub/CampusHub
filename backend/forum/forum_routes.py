@@ -1,14 +1,16 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func
 
 from auth.auth_routes import get_current_user, require_council_role
-from .schemas import Topic as TopicScheme, CreateTopicRequest
-from database.models import Topics, Comments
 from database.database import get_db
+from database.models import Comments, Topics
+
+from .schemas import CreateTopicRequest
+from .schemas import Topic as TopicScheme
 
 forum_router = APIRouter(
     prefix="/forum",
@@ -18,8 +20,7 @@ forum_router = APIRouter(
 
 @forum_router.get("/topics", response_model=List[TopicScheme])
 async def get_topics(
-        user: dict = Depends(get_current_user),
-        db: AsyncSession = Depends(get_db)
+    user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
         select(Topics, func.count(Comments.id).label("comment_count"))
@@ -33,7 +34,7 @@ async def get_topics(
             "title": topic.title,
             "topic_id": topic.id,
             "responses_count": count,
-            "anon": topic.anon
+            "anon": topic.anon,
         }
         for topic, count in rows
     ]
@@ -41,9 +42,9 @@ async def get_topics(
 
 @forum_router.post("/topics", response_model=TopicScheme)
 async def create_topic(
-        request: CreateTopicRequest,
-        user: dict = Depends(require_council_role),
-        db: AsyncSession = Depends(get_db)
+    request: CreateTopicRequest,
+    user: dict = Depends(require_council_role),
+    db: AsyncSession = Depends(get_db),
 ):
     title = request.title.strip()
     if not 1 < len(title) < 50:
@@ -57,5 +58,5 @@ async def create_topic(
         "title": new_topic.title,
         "topic_id": new_topic.id,
         "responses_count": 0,
-        "anon": new_topic.anon
+        "anon": new_topic.anon,
     }

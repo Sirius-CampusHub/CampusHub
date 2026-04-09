@@ -12,10 +12,10 @@ class CommentModel {
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
-    final authorRaw = json['author'] ?? json['author_name'] ?? json['authorName'];
+    final authorRaw =
+        json['author'] ?? json['author_name'] ?? json['authorName'];
     final contentRaw = json['content'] ?? json['text'];
     final topicIdRaw = json['topicId'] ?? json['topic_id'] ?? json['topicID'];
-
 
     return CommentModel(
       id: (json['id'] ?? json['comment_id'])?.toString() ?? '',

@@ -52,9 +52,8 @@ class TopicRepository {
         final List<dynamic> data = response.data;
         return data
             .map(
-              (json) => CommentModel.fromJson(
-                Map<String, dynamic>.from(json as Map),
-              ),
+              (json) =>
+                  CommentModel.fromJson(Map<String, dynamic>.from(json as Map)),
             )
             .toList();
       } else {
@@ -62,16 +61,12 @@ class TopicRepository {
       }
     } on DioException catch (e) {
       throw Exception("Ошибка сети при загрузке топиков: ${e.message}");
-    }   catch (e) {
+    } catch (e) {
       throw Exception("Неизвестная ошибка: $e");
-  }
+    }
   }
 
-
-  Future<void> createComment(
-    String content,
-    String topicId,
-  ) async {
+  Future<void> createComment(String content, String topicId) async {
     // _mockComments.insert(
     //   0,
     //   CommentModel(
@@ -88,21 +83,13 @@ class TopicRepository {
         await _authDataSource.deleteCurrentUser();
         throw Exception('Не удалось получить токен после регистрации');
       }
-      final data = {
-        "topic_id": topicId,
-        "content": content,
-      };
+      final data = {"topic_id": topicId, "content": content};
 
       await _dio.post(
         '/topic/comments',
         data: data,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
-
     } on DioException catch (e) {
       final data = e.response?.data;
       final errorDetail =
