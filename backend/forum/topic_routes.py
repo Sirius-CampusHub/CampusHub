@@ -56,13 +56,18 @@ async def create_comment(
     content = request.content.strip()
     if not 1 < len(content) < 200:
         raise HTTPException(status_code=400, detail="Comment content is invalid")
+
+    topic = await _get_db_topic(db, request.topic_id)
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic does not exist")
+
+
     new_comment = Comments(content=content, topic_id=request.topic_id, user_id=user.get("uid"))
     db.add(new_comment)
     await db.commit()
     await db.refresh(new_comment)
 
     author = await _get_db_user(db, new_comment.user_id)
-    topic = await _get_db_topic(db, new_comment.topic_id)
 
     return {
         "content": new_comment.content,
