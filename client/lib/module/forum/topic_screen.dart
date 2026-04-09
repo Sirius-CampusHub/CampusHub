@@ -12,7 +12,13 @@ import '../../core/dependencies.dart';
 class TopicScreen extends StatelessWidget {
   final String topicId;
   final String title;
-  const TopicScreen({super.key, required this.topicId, required this.title});
+  final bool isAnonymous;
+  const TopicScreen({
+    super.key,
+    required this.topicId,
+    required this.title,
+    required this.isAnonymous,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,12 @@ class TopicScreen extends StatelessWidget {
         appBar: AppBar(title: Text(title)),
         body: Column(
           children: [
-            Expanded(child: _TopicView(topicId: topicId)),
+            Expanded(
+              child: _TopicView(
+                topicId: topicId,
+                isAnonymousTopic: isAnonymous,
+              ),
+            ),
             Builder(
               builder: (context) => _CommentInputField(
                 onSubmit: (content) {
@@ -98,13 +109,11 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
-                buildCounter:
-                    (
-                      context, {
-                      required currentLength,
-                      required maxLength,
-                      required isFocused,
-                    }) => null,
+                buildCounter: (context,
+                        {required currentLength,
+                        required maxLength,
+                        required isFocused}) =>
+                    null,
               ),
             ),
             const SizedBox(width: 8),
@@ -132,7 +141,8 @@ class _CommentInputFieldState extends State<_CommentInputField> {
 
 class _TopicView extends StatelessWidget {
   final String topicId;
-  const _TopicView({required this.topicId});
+  final bool isAnonymousTopic;
+  const _TopicView({required this.topicId, required this.isAnonymousTopic});
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +171,10 @@ class _TopicView extends StatelessWidget {
             child: ListView.builder(
               itemCount: comments.length,
               itemBuilder: (context, index) {
-                return _Comment(comment: comments[index]);
+                return _Comment(
+                  comment: comments[index],
+                  isAnonymousTopic: isAnonymousTopic,
+                );
               },
             ),
           );
@@ -182,11 +195,16 @@ class _TopicView extends StatelessWidget {
 
 class _Comment extends StatelessWidget {
   final CommentModel comment;
+  final bool isAnonymousTopic;
 
-  const _Comment({required this.comment});
+  const _Comment({required this.comment, required this.isAnonymousTopic});
 
   @override
   Widget build(BuildContext context) {
+    final displayAuthor = isAnonymousTopic ? 'Аноним' : comment.author;
+    final avatarLetter =
+        displayAuthor.isNotEmpty ? displayAuthor[0].toUpperCase() : '?';
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Padding(
@@ -202,7 +220,7 @@ class _Comment extends StatelessWidget {
                     context,
                   ).colorScheme.primaryContainer,
                   child: Text(
-                    comment.author[0].toUpperCase(),
+                    avatarLetter,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.bold,
@@ -211,7 +229,7 @@ class _Comment extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  comment.author,
+                  displayAuthor,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ],

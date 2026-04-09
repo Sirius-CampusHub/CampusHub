@@ -297,157 +297,160 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
     final theme = Theme.of(context);
     final email = firebase.FirebaseAuth.instance.currentUser?.email ?? '';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Профиль'),
-        actions: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              return TextButton(
-                onPressed: state is AuthLoading
-                    ? null
-                    : () async {
-                        await _exitRegistration();
-                      },
-                child: const Text('Выйти'),
-              );
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Профиль'),
+          actions: [
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                return TextButton(
+                  onPressed: state is AuthLoading
+                      ? null
+                      : () async {
+                          await _exitRegistration();
+                        },
+                  child: const Text('Выйти'),
+                );
+              },
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthError) {
+                setState(() {
+                  _error = _getErrorMessage(state.error);
+                });
+              }
             },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthError) {
-              setState(() {
-                _error = _getErrorMessage(state.error);
-              });
-            }
-          },
-          builder: (context, state) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Шаг 2 из 2',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.primary,
+            builder: (context, state) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Шаг 2 из 2',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Как тебя видят в CampHub',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (email.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Text(
-                  email,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  'Как тебя видят в CampHub',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-              const SizedBox(height: 24),
-              _buildAvatarBlock(theme),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _displayNameController,
-                maxLength: _maxDisplayName,
-                textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'Имя в профиле',
-                  helperText: 'Как тебя видят другие',
-                  prefixIcon: Icon(Icons.badge_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _groupCodeController,
-                maxLength: _maxGroupCode,
-                decoration: const InputDecoration(
-                  labelText: 'Номер группы (необязательно)',
-                  prefixIcon: Icon(Icons.groups_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _telegramController,
-                maxLength: _maxTelegram,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'Telegram (необязательно)',
-                  helperText: 'Без @ или с @',
-                  prefixIcon: Icon(Icons.send_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _bioController,
-                maxLength: _maxBio,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  alignLabelWithHint: true,
-                  labelText: 'О себе (необязательно)',
-                  prefixIcon: Icon(Icons.notes_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    _error!,
-                    style: TextStyle(color: Colors.red.shade700),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton(
-                  onPressed: state is AuthLoading ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                if (email.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    email,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  child: state is AuthLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Завершить регистрацию',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                ],
+                const SizedBox(height: 24),
+                _buildAvatarBlock(theme),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _displayNameController,
+                  maxLength: _maxDisplayName,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Имя в профиле',
+                    helperText: 'Как тебя видят другие',
+                    prefixIcon: Icon(Icons.badge_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _groupCodeController,
+                  maxLength: _maxGroupCode,
+                  decoration: const InputDecoration(
+                    labelText: 'Номер группы (необязательно)',
+                    prefixIcon: Icon(Icons.groups_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _telegramController,
+                  maxLength: _maxTelegram,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    labelText: 'Telegram (необязательно)',
+                    helperText: 'Без @ или с @',
+                    prefixIcon: Icon(Icons.send_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _bioController,
+                  maxLength: _maxBio,
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    alignLabelWithHint: true,
+                    labelText: 'О себе (необязательно)',
+                    prefixIcon: Icon(Icons.notes_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
+                if (_error != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: Colors.red.shade700),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: state is AuthLoading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: state is AuthLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Завершить регистрацию',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

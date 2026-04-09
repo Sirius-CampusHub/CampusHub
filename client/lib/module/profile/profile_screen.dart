@@ -76,6 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _profile = updated;
       });
     }
+  context.read<AuthBloc>().add(AuthGetProfileDataRequested());
   }
 
   Widget _infoTile({
