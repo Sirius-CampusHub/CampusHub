@@ -24,6 +24,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCompleteRegistrationRequested>(_onCompleteRegistration);
     on<AuthSignOutRequested>(_onSignOut);
     on<AuthSubscriptionRequested>(_onSubscriptionRequest);
+    on<AuthGetProfileDataRequested>(_getProfileData);
+  }
+
+  Future<void> _getProfileData(
+      AuthGetProfileDataRequested event,
+      Emitter<AuthState> emit,) async {
+    late final usData;
+    if (state is AuthAuthenticated) {
+      usData = (state as AuthAuthenticated).profileModel;
+    } else {
+      emit(AuthUnauthenticated());
+      return;
+    }
+    emit(AuthLoading());
+    try {
+      final RegistrationProfileData regProf = await _authRepository.getProfileData();
+      final user = ProfileModel(registrationProfileData: regProf, userModel: usData.userModel);
+      emit(AuthAuthenticated(profileModel: user));
+    } catch (e) {
+      print(e.toString());
+      emit(AuthError(error: e as Exception));
+    }
   }
 
   // Authentication handlers

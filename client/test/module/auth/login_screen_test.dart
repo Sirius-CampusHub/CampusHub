@@ -72,4 +72,42 @@ void main() {
     expect(find.text('Пароли не сопадают'), findsOneWidget);
     verifyNever(() => authBloc.add(any()));
   });
+
+  testWidgets('dispatches sign-in event for valid credentials', (tester) async {
+    await tester.pumpWidget(makeWidget());
+
+    await tester.enterText(find.byType(TextField).at(0), 'mail@test.dev');
+    await tester.enterText(find.byType(TextField).at(1), 'password123');
+
+    await tester.tap(find.text('Войти'));
+    await tester.pump();
+
+    verify(
+      () => authBloc.add(
+        any(
+          that: isA<AuthSignInRequested>()
+              .having((event) => event.email, 'email', 'mail@test.dev')
+              .having((event) => event.password, 'password', 'password123'),
+        ),
+      ),
+    ).called(1);
+  });
+
+  testWidgets('clears repeated password when switching back to login', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeWidget());
+
+    await tester.tap(find.text('Нет аккаунта? Зарегистрируйся'));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField).at(2), 'repeat-pass');
+
+    await tester.tap(find.text('Уже есть аккаунт? Войди'));
+    await tester.pump();
+    await tester.tap(find.text('Нет аккаунта? Зарегистрируйся'));
+    await tester.pump();
+
+    final repeatField = tester.widget<TextField>(find.byType(TextField).at(2));
+    expect(repeatField.controller!.text, isEmpty);
+  });
 }
