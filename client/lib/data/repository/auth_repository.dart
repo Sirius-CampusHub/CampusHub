@@ -91,8 +91,8 @@ class AuthRepository {
 
       await _authDataSource.getToken(forceRefresh: true);
 
-      final token = await _authDataSource.getToken(forceRefresh: true);
-      print("Bearer ${token.toString()}");
+      // final token = await _authDataSource.getToken(forceRefresh: true);
+      // print("Bearer ${token.toString()}");
 
       final uid = _authDataSource.currentUser?.uid;
       if (uid == null) {
@@ -170,8 +170,8 @@ class AuthRepository {
     final authModel =
         ProfileModel(registrationProfileData: model, userModel: auth);
     return authModel;
-      String? token = await _authDataSource.getToken(forceRefresh: true);
-      print("Bearer "+ token.toString());
+      // String? token = await _authDataSource.getToken(forceRefresh: true);
+      // print("Bearer "+ token.toString());
   }
 
   Future<void> signOut() async {
@@ -220,6 +220,47 @@ class AuthRepository {
     } else {
       throw Exception('Не получилось войти в аккаунт');
     }
+  }
+
+  Future<RegistrationProfileData> updateProfileData(
+    RegistrationProfileData profile,
+  ) async {
+    final token = await _authDataSource.getToken(forceRefresh: true);
+    if (token == null) throw Exception('No token');
+
+    final authOptions = Options(
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    try {
+      await _dio.put(
+        'profile/update',
+        data: _profileUpdateJson(profile),
+        options: authOptions,
+      );
+    } on DioException catch (dioError) {
+      final errorMessage =
+          _extractApiDetail(dioError) ?? dioError.message ?? 'Ошибка сервера';
+      throw Exception(errorMessage);
+    }
+
+    try {
+      await _dio.patch(
+        'profile/avatar',
+        data: {
+          'avatar_emoji': profile.avatarEmoji != null
+              ? profile.avatarEmoji!.trim()
+              : '😀',
+        },
+        options: authOptions,
+      );
+    } on DioException catch (dioError) {
+      final errorMessage =
+          _extractApiDetail(dioError) ?? dioError.message ?? 'Ошибка сервера';
+      throw Exception(errorMessage);
+    }
+
+    return await getProfileData();
   }
 
   Future<bool> hasCompletedBackendProfile() async {
