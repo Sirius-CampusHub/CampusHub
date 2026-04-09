@@ -17,7 +17,7 @@ forum_router = APIRouter(
 
 
 @forum_router.get("/topics", response_model=List[TopicScheme])
-async def get_all_news(
+async def get_topics(
         user: dict = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
@@ -47,9 +47,9 @@ async def create_topic(
         user: dict = Depends(require_council_role),
         db: AsyncSession = Depends(get_db)
 ):
-    title = request.title
-    if len(title) > 50:
-        raise HTTPException(status_code=400, detail="Title too long")
+    title = request.title.strip()
+    if not 1 < len(title) < 50:
+        raise HTTPException(status_code=400, detail="Title is invalid")
     new_topic = Topics(title=title)
     db.add(new_topic)
     await db.commit()
