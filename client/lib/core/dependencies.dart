@@ -3,7 +3,6 @@ import 'package:client/data/repository/news_repository.dart';
 import 'package:client/data/repository/repository.dart';
 import 'package:flutter/widgets.dart';
 
-
 final class Dependencies {
   const Dependencies({
     required this.authRepository,
@@ -11,7 +10,6 @@ final class Dependencies {
     required this.scheduleRepository,
     required this.forumRepository,
     required this.topicRepository,
-
   });
 
   final AuthRepository authRepository;
@@ -19,7 +17,6 @@ final class Dependencies {
   final ScheduleRepository scheduleRepository;
   final ForumRepository forumRepository;
   final TopicRepository topicRepository;
-
 }
 
 class DependenciesScope extends InheritedWidget {

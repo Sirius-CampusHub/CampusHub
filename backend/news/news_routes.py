@@ -1,23 +1,24 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+﻿import datetime
+import io
+import os
+import uuid
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from PIL import Image
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from pydantic import BaseModel
-from typing import Optional, List
-import datetime
-import uuid
-import os
-import io
-from PIL import Image
-
-from database.database import get_db
-from database.models import News
 
 from auth.auth_routes import get_current_user, require_council_role
+from database.database import get_db
+from database.models import News
 
 router = APIRouter(
     prefix="/news",
     tags=["News"],
 )
+
 
 class NewsResponse(BaseModel):
     id: str
@@ -36,11 +37,11 @@ MAX_FILE_SIZE = 4 * 1024 * 1024
 
 @router.post("/", response_model=NewsResponse)
 async def create_news(
-        title: str = Form(...),
-        content: str = Form(...),
-        image: UploadFile = File(None),
-        user: dict = Depends(require_council_role),
-        db: AsyncSession = Depends(get_db)
+    title: str = Form(...),
+    content: str = Form(...),
+    image: UploadFile = File(None),
+    user: dict = Depends(require_council_role),
+    db: AsyncSession = Depends(get_db),
 ):
     image_url = None
 
@@ -48,7 +49,9 @@ async def create_news(
         contents = await image.read()
 
         if len(contents) > MAX_FILE_SIZE:
-            raise HTTPException(status_code=400, detail="Размер файла не должен превышать 2 МБ")
+            raise HTTPException(
+                status_code=400, detail="Размер файла не должен превышать 2 МБ"
+            )
 
         try:
             img = Image.open(io.BytesIO(contents))
@@ -66,13 +69,12 @@ async def create_news(
             image_url = f"/static/{file_name}"
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail="Неверный формат изображения или файл поврежден")
+            raise HTTPException(
+                status_code=400, detail="Неверный формат изображения или файл поврежден"
+            )
 
     new_news = News(
-        title=title,
-        content=content,
-        image_url=image_url,
-        author_id=user.get("uid")
+        title=title, content=content, image_url=image_url, author_id=user.get("uid")
     )
 
     db.add(new_news)
@@ -84,8 +86,7 @@ async def create_news(
 
 @router.get("/", response_model=List[NewsResponse])
 async def get_all_news(
-        user: dict = Depends(get_current_user),
-        db: AsyncSession = Depends(get_db)
+    user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(select(News).order_by(News.created_at.desc()))
     news_list = result.scalars().all()
@@ -94,9 +95,9 @@ async def get_all_news(
 
 @router.delete("/{news_id}")
 async def delete_news(
-        news_id: str,
-        user: dict = Depends(require_council_role),
-        db: AsyncSession = Depends(get_db)
+    news_id: str,
+    user: dict = Depends(require_council_role),
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(News).where(News.id == news_id))
     news_item = result.scalar_one_or_none()

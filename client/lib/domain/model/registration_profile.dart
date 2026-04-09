@@ -14,12 +14,12 @@ class RegistrationProfileData {
   });
 
   Map<String, dynamic> toJson() => {
-        'avatar_emoji': avatarEmoji,
-        'display_name': displayName,
-        'group_code': groupCode,
-        'telegram_handle': telegramHandle,
-        'bio': bio,
-      };
+    'avatar_emoji': avatarEmoji,
+    'display_name': displayName,
+    'group_code': groupCode,
+    'telegram_handle': telegramHandle,
+    'bio': bio,
+  };
 
   factory RegistrationProfileData.fromJson(Map<String, dynamic> json) {
     return RegistrationProfileData(

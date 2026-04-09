@@ -39,15 +39,15 @@ class TopicScreen extends StatelessWidget {
             ),
             Builder(
               builder: (context) => _CommentInputField(
-                  onSubmit: (content) {
-                    context.read<TopicBloc>().add(
-                      TopicCreateCommentRequested(
-                        content: content,
-                        topicId: topicId,
-                      ),
-                    );
-                  },
-                )
+                onSubmit: (content) {
+                  context.read<TopicBloc>().add(
+                    TopicCreateCommentRequested(
+                      content: content,
+                      topicId: topicId,
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -109,11 +109,13 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
-                buildCounter: (context,
-                        {required currentLength,
-                        required maxLength,
-                        required isFocused}) =>
-                    null,
+                buildCounter:
+                    (
+                      context, {
+                      required currentLength,
+                      required maxLength,
+                      required isFocused,
+                    }) => null,
               ),
             ),
             const SizedBox(width: 8),
@@ -164,9 +166,7 @@ class _TopicView extends StatelessWidget {
                 (state) => state is TopicLoaded || state is TopicError,
               );
 
-              topicBloc.add(
-                TopicLoadRequested(topicId: topicId),
-              );
+              topicBloc.add(TopicLoadRequested(topicId: topicId));
 
               await refreshCompleted;
             },
@@ -204,8 +204,9 @@ class _Comment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayAuthor = isAnonymousTopic ? 'Аноним' : comment.author;
-    final avatarLetter =
-        displayAuthor.isNotEmpty ? displayAuthor[0].toUpperCase() : '?';
+    final avatarLetter = displayAuthor.isNotEmpty
+        ? displayAuthor[0].toUpperCase()
+        : '?';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

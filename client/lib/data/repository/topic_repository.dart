@@ -10,26 +10,27 @@ class TopicRepository {
   TopicRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+  }) : _dio = dio,
+       _authDataSource = authDataSource;
 
   final List<CommentModel> _mockComments = [
     const CommentModel(
-        id: '1',
-        author: 'Daniel',
-        content: 'first comment!',
-        topicId: '1',
+      id: '1',
+      author: 'Daniel',
+      content: 'first comment!',
+      topicId: '1',
     ),
     const CommentModel(
-        id: '2',
-        author: 'Hleb',
-        content: 'another comment',
-        topicId: '1',
+      id: '2',
+      author: 'Hleb',
+      content: 'another comment',
+      topicId: '1',
     ),
     const CommentModel(
-        id: '3',
-        author: 'Varya',
-        content: 'yet another comment',
-        topicId: '2',
+      id: '3',
+      author: 'Varya',
+      content: 'yet another comment',
+      topicId: '2',
     ),
   ];
 
@@ -44,20 +45,15 @@ class TopicRepository {
       final response = await _dio.get(
         '/topic/comments',
         queryParameters: {'topic_id': topicId},
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data
             .map(
-              (json) => CommentModel.fromJson(
-                Map<String, dynamic>.from(json as Map),
-              ),
+              (json) =>
+                  CommentModel.fromJson(Map<String, dynamic>.from(json as Map)),
             )
             .toList();
       } else {
@@ -65,15 +61,12 @@ class TopicRepository {
       }
     } on DioException catch (e) {
       throw Exception("Ошибка сети при загрузке топиков: ${e.message}");
-    }   catch (e) {
+    } catch (e) {
       throw Exception("Неизвестная ошибка: $e");
-  }
+    }
   }
 
-  Future<void> createComment(
-    String content,
-    String topicId,
-  ) async {
+  Future<void> createComment(String content, String topicId) async {
     // _mockComments.insert(
     //   0,
     //   CommentModel(
@@ -90,21 +83,13 @@ class TopicRepository {
         await _authDataSource.deleteCurrentUser();
         throw Exception('Не удалось получить токен после регистрации');
       }
-      final data = {
-        "topic_id": topicId,
-        "content": content,
-      };
+      final data = {"topic_id": topicId, "content": content};
 
       await _dio.post(
         '/topic/comments',
         data: data,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
-
     } on DioException catch (e) {
       final data = e.response?.data;
       final errorDetail =

@@ -8,13 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.auth_routes import get_current_user
 from database.database import get_db
 from database.models import (
-    User as DBUser,
     USER_AVATAR_EMOJI_MAX_LEN,
     USER_BIO_MAX_LEN,
     USER_DISPLAY_NAME_MAX_LEN,
     USER_GROUP_CODE_MAX_LEN,
     USER_TELEGRAM_HANDLE_MAX_LEN,
 )
+from database.models import User as DBUser
 
 router = APIRouter(
     prefix="/profile",
@@ -91,9 +91,7 @@ class ProfileUpdateBody(BaseModel):
 
 
 class AvatarPatchBody(BaseModel):
-    avatar_emoji: str = Field(
-        ..., min_length=1, max_length=USER_AVATAR_EMOJI_MAX_LEN
-    )
+    avatar_emoji: str = Field(..., min_length=1, max_length=USER_AVATAR_EMOJI_MAX_LEN)
 
     @field_validator("avatar_emoji")
     @classmethod

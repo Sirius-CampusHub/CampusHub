@@ -7,7 +7,6 @@ import '../../domain/bloc/news/news_bloc.dart';
 import '../../domain/bloc/news/news_event.dart';
 import '../../domain/bloc/news/news_state.dart';
 
-
 class CreateNewsScreen extends StatefulWidget {
   const CreateNewsScreen({super.key});
 
@@ -32,7 +31,8 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   }
 
   Future<void> _saveNews() async {
-    if (_titleController.text.trim().isEmpty || _contentController.text.trim().isEmpty) {
+    if (_titleController.text.trim().isEmpty ||
+        _contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Заполните заголовок и текст')),
       );
@@ -68,9 +68,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
           if (state is NewsCreateSuccess) {
             Navigator.pop(context, true);
           } else if (state is NewsError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
             setState(() => _isLoading = false);
           }
         },
@@ -92,17 +92,27 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                       ),
                       child: _selectedImage != null
                           ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(_selectedImage!, fit: BoxFit.cover),
-                      )
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                _selectedImage!,
+                                fit: BoxFit.cover,
+                              ),
+                            )
                           : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_photo_alternate, size: 48, color: Colors.grey[600]),
-                          const SizedBox(height: 8),
-                          Text('Загрузить фото', style: TextStyle(color: Colors.grey[600])),
-                        ],
-                      ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_photo_alternate,
+                                  size: 48,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Загрузить фото',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                   const SizedBox(height: 24),

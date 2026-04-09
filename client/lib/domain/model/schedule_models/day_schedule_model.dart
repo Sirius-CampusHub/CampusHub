@@ -15,7 +15,9 @@ class DayScheduleModel {
 
   factory DayScheduleModel.fromJson(Map<String, dynamic> json) {
     List<LessonModel> day = [];
-    json['events'].forEach((el){day.add(LessonModel.fromJson(el));});
+    json['events'].forEach((el) {
+      day.add(LessonModel.fromJson(el));
+    });
     return DayScheduleModel(
       lessons: day,
       date: json['date'],

@@ -45,10 +45,20 @@ class _NewsScreenState extends State<NewsScreen> {
     super.dispose();
   }
 
-    String _formatDate(DateTime date) {
-    final utc = date.isUtc ? date : DateTime.utc(date.year, date.month, date.day, date.hour, date.minute, date.second);
+  String _formatDate(DateTime date) {
+    final utc = date.isUtc
+        ? date
+        : DateTime.utc(
+            date.year,
+            date.month,
+            date.day,
+            date.hour,
+            date.minute,
+            date.second,
+          );
     final local = utc.toLocal();
-    return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';  }
+    return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +72,9 @@ class _NewsScreenState extends State<NewsScreen> {
         },
         listener: (context, state) {
           if (state is NewsError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
@@ -75,8 +85,8 @@ class _NewsScreenState extends State<NewsScreen> {
           final newsList = state is NewsLoaded
               ? state.newsList
               : state is NewsError
-                  ? (state.previousNewsList ?? const [])
-                  : const [];
+              ? (state.previousNewsList ?? const [])
+              : const [];
 
           if (newsList.isEmpty) {
             return const Center(child: Text('Нет новостей'));
@@ -96,15 +106,21 @@ class _NewsScreenState extends State<NewsScreen> {
                 surfaceTintColor: Colors.transparent,
                 clipBehavior: Clip.antiAlias,
                 child: GestureDetector(
-                  onLongPress:(){
-                    final isAdmin = context.read<AuthBloc>().state is AuthAuthenticated &&
-                        (context.read<AuthBloc>().state as AuthAuthenticated).profileModel.userModel.role == UserRole.council;
+                  onLongPress: () {
+                    final isAdmin =
+                        context.read<AuthBloc>().state is AuthAuthenticated &&
+                        (context.read<AuthBloc>().state as AuthAuthenticated)
+                                .profileModel
+                                .userModel
+                                .role ==
+                            UserRole.council;
                     if (isAdmin) _confirmDelete(context, news.id);
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (news.fullImageUrl != null && news.fullImageUrl!.isNotEmpty)
+                      if (news.fullImageUrl != null &&
+                          news.fullImageUrl!.isNotEmpty)
                         CachedNetworkImage(
                           imageUrl: news.fullImageUrl!,
                           width: double.infinity,
@@ -113,10 +129,11 @@ class _NewsScreenState extends State<NewsScreen> {
                             aspectRatio: 16 / 9,
                             child: Center(child: CircularProgressIndicator()),
                           ),
-                          errorWidget: (context, url, error) => const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Icon(Icons.broken_image, size: 80),
-                          ),
+                          errorWidget: (context, url, error) =>
+                              const AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Icon(Icons.broken_image, size: 80),
+                              ),
                         ),
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -147,7 +164,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                   color: Colors.grey[600],
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -160,7 +177,6 @@ class _NewsScreenState extends State<NewsScreen> {
         },
       ),
 
-
       floatingActionButton: AdminFab(
         notifier: _buttonNotifier,
         onPressed: () async {
@@ -170,7 +186,7 @@ class _NewsScreenState extends State<NewsScreen> {
           );
         },
         heroTag: 'news_fab',
-      )
+      ),
     );
   }
 
@@ -181,7 +197,10 @@ class _NewsScreenState extends State<NewsScreen> {
         title: const Text('Удалить новость?'),
         content: const Text('Это действие нельзя отменить.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Отмена'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
