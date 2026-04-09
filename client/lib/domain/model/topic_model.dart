@@ -26,7 +26,10 @@ class TopicModel {
     final idRaw = json['id'] ?? json['topic_id'] ?? json['topicId'];
     final titleRaw = json['title'] ?? json['name'];
     final isAnonymousRaw =
-        json['is_anonymous'] ?? json['isAnonymous'] ?? json['anonymous'];
+        json['is_anonymous'] ??
+        json['isAnonymous'] ??
+        json['anonymous'] ??
+        json['anon'];
     final isAnonymous = isAnonymousRaw == true ||
         (isAnonymousRaw is String && isAnonymousRaw.toLowerCase() == 'true') ||
         (isAnonymousRaw is num && isAnonymousRaw != 0);

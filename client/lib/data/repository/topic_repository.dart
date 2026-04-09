@@ -90,14 +90,14 @@ class TopicRepository {
         await _authDataSource.deleteCurrentUser();
         throw Exception('Не удалось получить токен после регистрации');
       }
-      final formData = FormData.fromMap({
+      final data = {
         "topic_id": topicId,
         "content": content,
-      });
+      };
 
       await _dio.post(
         '/topic/comments',
-        data: formData,
+        data: data,
         options: Options(
           headers: {
             'Authorization': 'Bearer $rawToken',

@@ -79,7 +79,13 @@ class ForumRepository {
         await _authDataSource.deleteCurrentUser();
         throw Exception('Не удалось получить токен после регистрации');
       }
-      final formData = {'title': title, 'is_anonymous': isAnonymous};
+      final formData = {
+        'title': title,
+        // backend seems to use `anon`
+        'anon': isAnonymous,
+        // keep for backwards compatibility if backend also supports it
+        'is_anonymous': isAnonymous,
+      };
 
       print('=== SENDING POST to /forum/topics with data: $formData');
       final response = await _dio.post(
