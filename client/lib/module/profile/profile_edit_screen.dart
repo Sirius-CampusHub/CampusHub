@@ -308,6 +308,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               enabled: !_isSaving,
               maxLength: _maxBio,
               maxLines: 3,
+              minLines: 1,
               decoration: const InputDecoration(
                 alignLabelWithHint: true,
                 labelText: 'О себе (необязательно)',

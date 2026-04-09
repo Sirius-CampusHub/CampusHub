@@ -27,3 +27,5 @@ class AuthSignInRequested extends AuthEvent {
 class AuthSignOutRequested extends AuthEvent {}
 
 class AuthSubscriptionRequested extends AuthEvent {}
+
+class AuthGetProfileDataRequested extends AuthEvent {}
