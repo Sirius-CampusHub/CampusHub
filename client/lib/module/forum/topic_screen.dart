@@ -258,7 +258,6 @@ import 'package:client/domain/bloc/topic/topic_event.dart';
 import 'package:client/domain/bloc/topic/topic_state.dart';
 import 'package:client/domain/bloc/topic/topic_controller.dart';
 
-import '../../core/dependencies.dart';
 
 class TopicScreen extends StatelessWidget {
   final String topicId;
@@ -539,7 +538,8 @@ class _Comment extends StatelessWidget {
       return;
     }
 
-    // Показываем диалог с профилем
+
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
