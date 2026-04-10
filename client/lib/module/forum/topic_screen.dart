@@ -402,6 +402,7 @@ class _TopicView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TopicLoaded) {
           final comments = state.comments;
+          final profiles = state.profiles;
 
           if (comments.isEmpty) {
             return const Center(child: Text('Пока нет сообщений'));
@@ -409,22 +410,16 @@ class _TopicView extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              final topicBloc = context.read<TopicBloc>();
-              final refreshCompleted = topicBloc.stream.firstWhere(
-                    (state) => state is TopicLoaded || state is TopicError,
-              );
-
-              topicBloc.add(
-                TopicLoadRequested(topicId: topicId),
-              );
-
-              await refreshCompleted;
+              context.read<TopicBloc>().add(TopicLoadRequested(topicId: topicId));
             },
             child: ListView.builder(
               itemCount: comments.length,
               itemBuilder: (context, index) {
+                final comment = comments[index];
+                final profile = profiles[comment.author_id];
                 return _Comment(
-                  comment: comments[index],
+                  comment: comment,
+                  profile: profile,
                   isAnonymousTopic: isAnonymousTopic,
                 );
               },
@@ -432,13 +427,9 @@ class _TopicView extends StatelessWidget {
           );
         } else if (state is TopicError) {
           return Center(
-            child: Text(
-              'Ошибка: ${state.error}',
-              style: const TextStyle(color: Colors.red),
-            ),
+            child: Text('Ошибка: ${state.error}', style: const TextStyle(color: Colors.red)),
           );
         }
-
         return const SizedBox.shrink();
       },
     );
@@ -447,24 +438,28 @@ class _TopicView extends StatelessWidget {
 
 class _Comment extends StatelessWidget {
   final CommentModel comment;
+  final RegistrationProfileData? profile;
   final bool isAnonymousTopic;
 
-  const _Comment({required this.comment, required this.isAnonymousTopic});
+  const _Comment({
+    required this.comment,
+    required this.profile,
+    required this.isAnonymousTopic,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final displayAuthor = isAnonymousTopic ? 'Аноним' : comment.author_id;
-    final avatarLetter = displayAuthor.isNotEmpty && !isAnonymousTopic
-        ? displayAuthor[0].toUpperCase()
-        : '?';
-
-    final bool canOpenProfile = !isAnonymousTopic && comment.author_id.isNotEmpty;
+    final displayName = isAnonymousTopic
+        ? 'Аноним'
+        : (profile?.displayName ?? comment.author_id);
+    final avatarEmoji = profile?.avatarEmoji ?? '?';
+    final showEmoji = profile != null && !isAnonymousTopic;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        onTap: canOpenProfile
-            ? () => _showProfileDialog(context, comment.author_id)
+        onTap: (!isAnonymousTopic && comment.author_id.isNotEmpty && profile != null)
+            ? () => _showProfileDialog(context, profile!)
             : null,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -474,11 +469,18 @@ class _Comment extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    child: Text(
-                      avatarLetter,
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: showEmoji
+                        ? Text(avatarEmoji, style: const TextStyle(fontSize: 18))
+                        : Text(
+                      displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold,
@@ -486,9 +488,12 @@ class _Comment extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    displayAuthor,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  Expanded(
+                    child: Text(
+                      displayName,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
@@ -501,58 +506,17 @@ class _Comment extends StatelessWidget {
     );
   }
 
-  Future<void> _showProfileDialog(BuildContext context, String userId) async {
-    final authRepo = context.dependencies.authRepository;
-    print('USER ID $userId');
-    final completer = Completer<BuildContext>();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        completer.complete(dialogContext);
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
-    final dialogContext = await completer.future;
-
-    RegistrationProfileData? profile;
-    String? error;
-
-    try {
-      profile = await authRepo.getUser(userId);
-    } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
-      print('Error loading profile: $error');
-    } finally {
-      if (dialogContext.mounted) {
-        Navigator.of(dialogContext).pop();
-      }
-    }
-
-    if (!context.mounted) return;
-
-    if (error != null || profile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error ?? 'Не удалось загрузить профиль')),
-      );
-      return;
-    }
-
-
-
+  void _showProfileDialog(BuildContext context, RegistrationProfileData profile) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Row(
           children: [
-            Text(
-              profile?.avatarEmoji ?? '😀',
-              style: const TextStyle(fontSize: 28),
-            ),
+            Text(profile.avatarEmoji ?? '😀', style: const TextStyle(fontSize: 28)),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                profile?.displayName ?? 'Пользователь',
+                profile.displayName ?? 'Пользователь',
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -563,15 +527,15 @@ class _Comment extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (profile?.groupCode?.isNotEmpty == true)
-              _infoRow(Icons.groups, 'Группа', profile!.groupCode!),
-            if (profile?.telegramHandle?.isNotEmpty == true)
-              _infoRow(Icons.send, 'Telegram', profile!.telegramHandle!),
-            if (profile?.bio?.isNotEmpty == true)
-              _infoRow(Icons.notes, 'О себе', profile!.bio!),
-            if (profile?.groupCode?.isEmpty != false &&
-                profile?.telegramHandle?.isEmpty != false &&
-                profile?.bio?.isEmpty != false)
+            if (profile.groupCode?.isNotEmpty == true)
+              _infoRow(Icons.groups, 'Группа', profile.groupCode!),
+            if (profile.telegramHandle?.isNotEmpty == true)
+              _infoRow(Icons.send, 'Telegram', profile.telegramHandle!),
+            if (profile.bio?.isNotEmpty == true)
+              _infoRow(Icons.notes, 'О себе', profile.bio!),
+            if (profile.groupCode?.isEmpty != false &&
+                profile.telegramHandle?.isEmpty != false &&
+                profile.bio?.isEmpty != false)
               const Text('Пользователь не заполнил дополнительную информацию'),
           ],
         ),

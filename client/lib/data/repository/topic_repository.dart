@@ -1,16 +1,20 @@
 import 'package:client/domain/model/forum_models/comment_model.dart';
 import 'package:dio/dio.dart';
 
+import '../../domain/model/registration_profile.dart';
 import '../source/firebase_auth_source.dart';
+import 'auth_repository.dart';
 
 class TopicRepository {
   final FirebaseAuthDataSource _authDataSource;
   final Dio _dio;
+  final AuthRepository _authRepository;
 
   TopicRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+    required AuthRepository authRepository,
+  }) : _dio = dio, _authDataSource = authDataSource, _authRepository = authRepository;
 
   final List<CommentModel> _mockComments = [
     const CommentModel(
@@ -69,6 +73,10 @@ class TopicRepository {
     }   catch (e) {
       throw Exception("Неизвестная ошибка: $e");
   }
+  }
+
+  Future<RegistrationProfileData> getUserProfile(String userId) async {
+    return await _authRepository.getUser(userId);
   }
 
   Future<void> createComment(
