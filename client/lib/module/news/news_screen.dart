@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:client/domain/model/user_role.dart';
+import 'package:client/domain/model/user_models/user_role.dart';
 import '../../domain/bloc/auth/auth_bloc.dart';
 import '../../domain/bloc/auth/auth_state.dart';
 import '../../domain/bloc/news/news_bloc.dart';
@@ -92,87 +92,104 @@ class _NewsScreenState extends State<NewsScreen> {
             return const Center(child: Text('Нет новостей'));
           }
 
-          return ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: newsList.length,
-            itemBuilder: (context, index) {
-              final news = newsList[index];
+          return RefreshIndicator(
+            onRefresh: () async {
+              final newsBloc = context.read<NewsBloc>();
+              newsBloc.add(FetchNews());
+              try {
+                await newsBloc.stream
+                    .firstWhere(
+                      (state) => state is NewsLoaded || state is NewsError,
+                  orElse: () => NewsError(message: 'Unknown error'),
+                )
+                    .timeout(const Duration(seconds: 5));
+              } catch (e) {
+                rethrow;
+              }
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                final news = newsList[index];
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                clipBehavior: Clip.antiAlias,
-                child: GestureDetector(
-                  onLongPress: () {
-                    final isAdmin =
-                        context.read<AuthBloc>().state is AuthAuthenticated &&
-                        (context.read<AuthBloc>().state as AuthAuthenticated)
-                                .profileModel
-                                .userModel
-                                .role ==
-                            UserRole.council;
-                    if (isAdmin) _confirmDelete(context, news.id);
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (news.fullImageUrl != null &&
-                          news.fullImageUrl!.isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: news.fullImageUrl!,
-                          width: double.infinity,
-                          fit: BoxFit.fitWidth,
-                          placeholder: (context, url) => const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Center(child: CircularProgressIndicator()),
+                return Card(
+                  margin:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  clipBehavior: Clip.antiAlias,
+                  child: GestureDetector(
+                    onLongPress: () {
+                      final isAdmin = context.read<AuthBloc>().state
+                      is AuthAuthenticated &&
+                          (context.read<AuthBloc>().state
+                          as AuthAuthenticated)
+                              .profileModel
+                              .userModel
+                              .role ==
+                              UserRole.council;
+                      if (isAdmin) _confirmDelete(context, news.id);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (news.fullImageUrl != null &&
+                            news.fullImageUrl!.isNotEmpty)
+                          CachedNetworkImage(
+                            imageUrl: news.fullImageUrl!,
+                            width: double.infinity,
+                            fit: BoxFit.fitWidth,
+                            placeholder: (context, url) => const AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            errorWidget: (context, url, error) =>
+                            const AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Icon(Icons.broken_image, size: 80),
+                            ),
                           ),
-                          errorWidget: (context, url, error) =>
-                              const AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: Icon(Icons.broken_image, size: 80),
-                              ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              news.title,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-                            Text(
-                              news.content,
-                              textAlign: TextAlign.justify,
-                              style: const TextStyle(fontSize: 15),
-                            ),
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                _formatDate(news.createdAt),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                news.title,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                news.content,
+                                textAlign: TextAlign.justify,
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  _formatDate(news.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
@@ -186,7 +203,7 @@ class _NewsScreenState extends State<NewsScreen> {
           );
         },
         heroTag: 'news_fab',
-      ),
+      )
     );
   }
 

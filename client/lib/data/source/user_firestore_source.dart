@@ -19,8 +19,6 @@ class UserFirestoreDataSource {
         return UserModel.fromFirestore(doc.id, doc.data()!);
       }
     } catch (e) {
-      // TODO: Добавить логирование
-      print('Ошибка чтения из Firestore: $e');
     }
     return null;
   }

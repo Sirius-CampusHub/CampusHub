@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client/domain/bloc/auth/auth_bloc.dart';
 import 'package:client/domain/bloc/auth/auth_state.dart';
-import 'package:client/domain/model/user_role.dart';
+import 'package:client/domain/model/user_models/user_role.dart';
 
 class AdminFab extends StatelessWidget {
   final VoidCallback onPressed;

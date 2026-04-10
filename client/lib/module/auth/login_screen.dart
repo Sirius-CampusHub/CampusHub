@@ -120,7 +120,12 @@ class _LoginScreenState extends State<LoginScreen> {
             builder: (context, state) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.school, size: 80, color: Colors.blue),
+                Image.asset(
+                  'assets/icon/icon_tansparent.png',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.contain,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'Кампус.Хаб',

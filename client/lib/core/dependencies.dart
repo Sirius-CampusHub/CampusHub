@@ -1,5 +1,3 @@
-import 'package:client/data/repository/auth_repository.dart';
-import 'package:client/data/repository/news_repository.dart';
 import 'package:client/data/repository/repository.dart';
 import 'package:flutter/widgets.dart';
 

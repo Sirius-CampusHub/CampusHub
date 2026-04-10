@@ -13,7 +13,6 @@ class FirebaseAuthDataSource {
     try {
       return await _auth.currentUser?.getIdToken(forceRefresh);
     } catch (e) {
-      // TODO: Добавить логирование
       rethrow;
     }
   }

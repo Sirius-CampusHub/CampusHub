@@ -104,9 +104,6 @@ class AuthRepository {
 
       await _authDataSource.getToken(forceRefresh: true);
 
-      // final token = await _authDataSource.getToken(forceRefresh: true);
-      // print("Bearer ${token.toString()}");
-
       final uid = _authDataSource.currentUser?.uid;
       if (uid == null) {
         throw Exception('Сессия потеряна после регистрации');
@@ -122,10 +119,8 @@ class AuthRepository {
 
       return newUser;
     } on firebase.FirebaseAuthException {
-      print('Ошибка при регистрации.');
       rethrow;
     } catch (e) {
-      // TODO: Логирование
       rethrow;
     }
   }
@@ -185,8 +180,8 @@ class AuthRepository {
       userModel: auth,
     );
     return authModel;
-    // String? token = await _authDataSource.getToken(forceRefresh: true);
-    // print("Bearer "+ token.toString());
+      // String? token = await _authDataSource.getToken(forceRefresh: true);
+      // print("Bearer "+ token.toString());
   }
 
   Future<void> signOut() async {
@@ -215,8 +210,7 @@ class AuthRepository {
 
         final data = response.data;
 
-        // TODO убрать
-        print(data);
+
         if (data is! Map<String, dynamic>) {
           throw Exception('Неправильный формат response при логине.');
         }
@@ -224,7 +218,6 @@ class AuthRepository {
         final model = RegistrationProfileData.fromJson(data);
         return model;
       } on DioException catch (e) {
-        print(e);
         rethrow;
       } catch (e) {
         rethrow;
@@ -291,14 +284,42 @@ class AuthRepository {
       return (displayName != null && displayName.isNotEmpty) &&
           (avatarEmoji != null && avatarEmoji.isNotEmpty);
     } on DioException catch (e) {
-      print(e.message);
       if (e.response?.statusCode == 404) {
         return false;
       }
       return false;
     } catch (e) {
-      print(e.toString());
       return false;
+    }
+  }
+
+  Future<RegistrationProfileData> getUser(String userId) async {
+    if (userId.isEmpty || userId.length < 10) {
+      throw Exception('Некорректный идентификатор пользователя');
+    }
+
+    final token = await _authDataSource.getToken(forceRefresh: true);
+    if (token == null) throw Exception('No token');
+
+    try {
+      final response = await _dio.get(
+        'profile/user/$userId',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return RegistrationProfileData.fromJson(data);
+      } else {
+        throw Exception('Неправильный формат ответа');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception('Пользователь не найден');
+      }
+      throw Exception('Ошибка загрузки профиля: ${e.message}');
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:client/domain/model/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +7,9 @@ import 'package:client/domain/bloc/topic/topic_state.dart';
 import 'package:client/domain/bloc/topic/topic_controller.dart';
 
 import '../../core/dependencies.dart';
+import '../../domain/model/forum_models/comment_model.dart';
+import '../../domain/model/registration_profile.dart';
+
 
 class TopicScreen extends StatelessWidget {
   final String topicId;
@@ -23,10 +25,11 @@ class TopicScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topicRepository = context.dependencies.topicRepository;
+    final authRepository = context.dependencies.authRepository;
     return BlocProvider(
       create: (context) =>
-          TopicBloc(repository: topicRepository)
-            ..add(TopicLoadRequested(topicId: topicId)),
+      TopicBloc(topicRepository: topicRepository, authRepository: authRepository)
+        ..add(TopicLoadRequested(topicId: topicId)),
       child: Scaffold(
         appBar: AppBar(title: Text(title)),
         body: Column(
@@ -38,16 +41,16 @@ class TopicScreen extends StatelessWidget {
               ),
             ),
             Builder(
-              builder: (context) => _CommentInputField(
-                onSubmit: (content) {
-                  context.read<TopicBloc>().add(
-                    TopicCreateCommentRequested(
-                      content: content,
-                      topicId: topicId,
-                    ),
-                  );
-                },
-              ),
+                builder: (context) => _CommentInputField(
+                  onSubmit: (content) {
+                    context.read<TopicBloc>().add(
+                      TopicCreateCommentRequested(
+                        content: content,
+                        topicId: topicId,
+                      ),
+                    );
+                  },
+                )
             ),
           ],
         ),
@@ -109,13 +112,11 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                     vertical: 10,
                   ),
                 ),
-                buildCounter:
-                    (
-                      context, {
-                      required currentLength,
+                buildCounter: (context,
+                    {required currentLength,
                       required maxLength,
-                      required isFocused,
-                    }) => null,
+                      required isFocused}) =>
+                null,
               ),
             ),
             const SizedBox(width: 8),
@@ -154,6 +155,7 @@ class _TopicView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TopicLoaded) {
           final comments = state.comments;
+          final profiles = state.profiles;
 
           if (comments.isEmpty) {
             return const Center(child: Text('Пока нет сообщений'));
@@ -161,20 +163,16 @@ class _TopicView extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              final topicBloc = context.read<TopicBloc>();
-              final refreshCompleted = topicBloc.stream.firstWhere(
-                (state) => state is TopicLoaded || state is TopicError,
-              );
-
-              topicBloc.add(TopicLoadRequested(topicId: topicId));
-
-              await refreshCompleted;
+              context.read<TopicBloc>().add(TopicLoadRequested(topicId: topicId));
             },
             child: ListView.builder(
               itemCount: comments.length,
               itemBuilder: (context, index) {
+                final comment = comments[index];
+                final profile = profiles[comment.author_id];
                 return _Comment(
-                  comment: comments[index],
+                  comment: comment,
+                  profile: profile,
                   isAnonymousTopic: isAnonymousTopic,
                 );
               },
@@ -182,10 +180,7 @@ class _TopicView extends StatelessWidget {
           );
         } else if (state is TopicError) {
           return Center(
-            child: Text(
-              'Ошибка: ${state.error}',
-              style: const TextStyle(color: Colors.red),
-            ),
+            child: Text('Ошибка: ${state.error}', style: const TextStyle(color: Colors.red)),
           );
         }
 
@@ -197,50 +192,136 @@ class _TopicView extends StatelessWidget {
 
 class _Comment extends StatelessWidget {
   final CommentModel comment;
+  final RegistrationProfileData? profile;
   final bool isAnonymousTopic;
 
-  const _Comment({required this.comment, required this.isAnonymousTopic});
+  const _Comment({
+    required this.comment,
+    required this.profile,
+    required this.isAnonymousTopic,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final displayAuthor = isAnonymousTopic ? 'Аноним' : comment.author;
-    final avatarLetter = displayAuthor.isNotEmpty
-        ? displayAuthor[0].toUpperCase()
-        : '?';
+    final displayName = isAnonymousTopic
+        ? 'Аноним'
+        : (profile?.displayName ?? comment.author_id);
+    final avatarEmoji = profile?.avatarEmoji ?? '?';
+    final showEmoji = profile != null && !isAnonymousTopic;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer,
-                  child: Text(
-                    avatarLetter,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: (!isAnonymousTopic && comment.author_id.isNotEmpty && profile != null)
+            ? () => _showProfileDialog(context, profile!)
+            : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: showEmoji
+                        ? Text(avatarEmoji, style: const TextStyle(fontSize: 18))
+                        : Text(
+                      displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  displayAuthor,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      displayName,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(comment.content),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showProfileDialog(BuildContext context, RegistrationProfileData profile) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          children: [
+            Text(profile.avatarEmoji ?? '😀', style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                profile.displayName ?? 'Пользователь',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(comment.content),
           ],
         ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (profile.groupCode?.isNotEmpty == true)
+              _infoRow(Icons.groups, 'Группа', profile.groupCode!),
+            if (profile.telegramHandle?.isNotEmpty == true)
+              _infoRow(Icons.send, 'Telegram', profile.telegramHandle!),
+            if (profile.bio?.isNotEmpty == true)
+              _infoRow(Icons.notes, 'О себе', profile.bio!),
+            if (profile.groupCode?.isEmpty != false &&
+                profile.telegramHandle?.isEmpty != false &&
+                profile.bio?.isEmpty != false)
+              const Text('Пользователь не заполнил дополнительную информацию'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Закрыть'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 2),
+                Text(value),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

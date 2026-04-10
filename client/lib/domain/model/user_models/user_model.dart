@@ -1,4 +1,4 @@
-import 'package:client/domain/model/user_role.dart';
+import 'package:client/domain/model/user_models/user_role.dart';
 
 class UserModel {
   final String id; // Уникальный UID из Firebase Auth

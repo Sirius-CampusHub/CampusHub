@@ -2,6 +2,7 @@
 import 'package:client/data/repository/repository.dart';
 import 'package:client/data/source/source.dart';
 import 'package:client/domain/bloc/forum/forum_controller.dart';
+import 'package:flutter/services.dart';
 import 'core/dependencies.dart';
 import 'domain/bloc/auth/auth_bloc.dart';
 import 'domain/bloc/auth/auth_event.dart';
@@ -27,6 +28,9 @@ import 'utils/firebase_options.dart';
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final dio = createAppHttpClient();
 

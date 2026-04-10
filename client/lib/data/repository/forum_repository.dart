@@ -1,4 +1,4 @@
-import 'package:client/domain/model/topic_model.dart';
+import 'package:client/domain/model/forum_models/topic_model.dart';
 import 'package:dio/dio.dart';
 
 import '../source/firebase_auth_source.dart';
@@ -67,6 +67,7 @@ class ForumRepository {
     }
   }
 
+
   Future<void> createTopic(String title, bool isAnonymous) async {
     try {
       final rawToken = await _authDataSource.getToken();
@@ -76,22 +77,16 @@ class ForumRepository {
       }
       final formData = {
         'title': title,
-        // backend seems to use `anon`
         'anon': isAnonymous,
-        // keep for backwards compatibility if backend also supports it
-        'is_anonymous': isAnonymous,
       };
 
-      print('=== SENDING POST to /forum/topics with data: $formData');
       final response = await _dio.post(
         '/forum/topics',
         data: formData,
         options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
       print('=== CREATE TOPIC RESPONSE status: ${response.statusCode}');
-      print(
-        '=== CREATE TOPIC RESPONSE data type: ${response.data.runtimeType}',
-      );
+      print('=== CREATE TOPIC RESPONSE data type: ${response.data.runtimeType}');
       print('=== CREATE TOPIC RESPONSE data: ${response.data}');
     } on DioException catch (e) {
       print('=== DIO EXCEPTION: ${e.message}');
