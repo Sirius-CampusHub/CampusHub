@@ -58,7 +58,7 @@ void main() async {
 
   final scheduleRepository = ScheduleRepository(dio: dio);
 
-  final topicRepository = TopicRepository(dio: dio, authDataSource: authDataSource, authRepository: authRepository,);
+  final topicRepository = TopicRepository(dio: dio, authDataSource: authDataSource);
 
   final forumRepository = ForumRepository(dio: dio, authDataSource: authDataSource);
 

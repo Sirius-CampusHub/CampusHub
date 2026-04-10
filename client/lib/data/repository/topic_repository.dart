@@ -8,13 +8,11 @@ import 'auth_repository.dart';
 class TopicRepository {
   final FirebaseAuthDataSource _authDataSource;
   final Dio _dio;
-  final AuthRepository _authRepository;
 
   TopicRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-    required AuthRepository authRepository,
-  }) : _dio = dio, _authDataSource = authDataSource, _authRepository = authRepository;
+  }) : _dio = dio, _authDataSource = authDataSource;
 
   final List<CommentModel> _mockComments = [
     const CommentModel(
@@ -74,10 +72,7 @@ class TopicRepository {
       throw Exception("Неизвестная ошибка: $e");
   }
   }
-
-  Future<RegistrationProfileData> getUserProfile(String userId) async {
-    return await _authRepository.getUser(userId);
-  }
+  
 
   Future<void> createComment(
     String content,
