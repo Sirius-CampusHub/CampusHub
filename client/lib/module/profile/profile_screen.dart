@@ -42,7 +42,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
-      final profile = await context.dependencies.authRepository.getProfileData();
+      final profile = await context.dependencies.authRepository
+          .getProfileData();
       if (!mounted) return;
       _profile = profile;
       setState(() {
@@ -75,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _profile = updated;
       });
     }
-  context.read<AuthBloc>().add(AuthGetProfileDataRequested());
+    context.read<AuthBloc>().add(AuthGetProfileDataRequested());
   }
 
   Widget _infoTile({
@@ -120,7 +121,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.35,
+                ),
                 border: Border.all(color: theme.colorScheme.primary, width: 2),
               ),
               child: Text(avatar, style: const TextStyle(fontSize: 42)),
@@ -160,7 +163,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _infoTile(
                     icon: Icons.notes_outlined,
                     title: 'О себе',
-                    value: (profile.bio ?? '').isEmpty ? 'Не заполнено' : profile.bio!,
+                    value: (profile.bio ?? '').isEmpty
+                        ? 'Не заполнено'
+                        : profile.bio!,
                   ),
                 ],
               ),

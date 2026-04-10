@@ -7,10 +7,7 @@ abstract class AuthEvent {}
 class AuthSignUpBasicRequested extends AuthEvent {
   final String email;
   final String password;
-  AuthSignUpBasicRequested({
-    required this.email,
-    required this.password,
-  });
+  AuthSignUpBasicRequested({required this.email, required this.password});
 }
 
 class AuthCompleteRegistrationRequested extends AuthEvent {

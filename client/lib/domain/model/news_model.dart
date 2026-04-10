@@ -8,7 +8,6 @@ class NewsModel {
   final String authorId;
   final DateTime createdAt;
 
-
   NewsModel({
     required this.id,
     required this.title,
@@ -31,7 +30,8 @@ class NewsModel {
       content: (json['content'] as String?)?.trim() ?? '',
       imageUrl: (json['image_url'] as String?)?.trim(),
       authorId: (json['author_id'])?.toString() ?? '',
-      createdAt: DateTime.tryParse(createdAtRaw?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(createdAtRaw?.toString() ?? '') ??
           DateTime.fromMillisecondsSinceEpoch(0),
     );
   }

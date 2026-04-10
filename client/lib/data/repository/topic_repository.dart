@@ -1,9 +1,7 @@
-import 'package:client/domain/model/forum_models/comment_model.dart';
 import 'package:dio/dio.dart';
 
-import '../../domain/model/registration_profile.dart';
+import '../../domain/model/forum_models/comment_model.dart';
 import '../source/firebase_auth_source.dart';
-import 'auth_repository.dart';
 
 class TopicRepository {
   final FirebaseAuthDataSource _authDataSource;
@@ -12,7 +10,8 @@ class TopicRepository {
   TopicRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+  }) : _dio = dio,
+       _authDataSource = authDataSource;
 
   final List<CommentModel> _mockComments = [
     const CommentModel(
@@ -46,11 +45,7 @@ class TopicRepository {
       final response = await _dio.get(
         '/topic/comments',
         queryParameters: {'topic_id': topicId},
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
 
       if (response.statusCode == 200) {
@@ -58,9 +53,8 @@ class TopicRepository {
         print(response.data);
         return data
             .map(
-              (json) => CommentModel.fromJson(
-                Map<String, dynamic>.from(json as Map),
-              ),
+              (json) =>
+                  CommentModel.fromJson(Map<String, dynamic>.from(json as Map)),
             )
             .toList();
       } else {
@@ -72,7 +66,7 @@ class TopicRepository {
       throw Exception("Неизвестная ошибка: $e");
   }
   }
-  
+
 
   Future<void> createComment(
     String content,
@@ -85,19 +79,12 @@ class TopicRepository {
         await _authDataSource.deleteCurrentUser();
         throw Exception('Не удалось получить токен после регистрации');
       }
-      final data = {
-        "topic_id": topicId,
-        "content": content,
-      };
+      final data = {"topic_id": topicId, "content": content};
 
       await _dio.post(
         '/topic/comments',
         data: data,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
 
     } on DioException catch (e) {

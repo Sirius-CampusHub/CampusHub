@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:client/domain/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class RegistrationDraftStorage {
   RegistrationDraftStorage._();
 

@@ -5,7 +5,6 @@ import 'package:client/domain/bloc/auth/auth_bloc.dart';
 import 'package:client/domain/bloc/auth/auth_state.dart';
 import 'package:client/domain/model/user_models/user_role.dart';
 
-
 class AdminFab extends StatelessWidget {
   final VoidCallback onPressed;
   final ValueListenable<bool>? notifier;
@@ -22,7 +21,8 @@ class AdminFab extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAdmin = context.select((AuthBloc bloc) {
       final state = bloc.state;
-      return state is AuthAuthenticated && state.profileModel.userModel.role == UserRole.council;
+      return state is AuthAuthenticated &&
+          state.profileModel.userModel.role == UserRole.council;
     });
 
     if (!isAdmin) return const SizedBox.shrink();

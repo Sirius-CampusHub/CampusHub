@@ -48,8 +48,14 @@ class _NewsScreenState extends State<NewsScreen> {
   String _formatDate(DateTime date) {
     final utc = date.isUtc
         ? date
-        : DateTime.utc(date.year, date.month, date.day, date.hour,
-        date.minute, date.second);
+        : DateTime.utc(
+            date.year,
+            date.month,
+            date.day,
+            date.hour,
+            date.minute,
+            date.second,
+          );
     final local = utc.toLocal();
     return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
   }
@@ -66,9 +72,9 @@ class _NewsScreenState extends State<NewsScreen> {
         },
         listener: (context, state) {
           if (state is NewsError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
@@ -187,6 +193,7 @@ class _NewsScreenState extends State<NewsScreen> {
           );
         },
       ),
+
       floatingActionButton: AdminFab(
         notifier: _buttonNotifier,
         onPressed: () async {
@@ -196,7 +203,7 @@ class _NewsScreenState extends State<NewsScreen> {
           );
         },
         heroTag: 'news_fab',
-      ),
+      )
     );
   }
 
@@ -208,7 +215,9 @@ class _NewsScreenState extends State<NewsScreen> {
         content: const Text('Это действие нельзя отменить.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Отмена')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Отмена'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);

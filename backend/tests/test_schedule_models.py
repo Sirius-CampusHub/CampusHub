@@ -45,7 +45,14 @@ def test_event_keeps_teacher_dicts():
         group="GROUP-1",
         code="MATH",
         color=None,
-        teachers=[{"first_name": "Иван", "last_name": "Иванов", "middle_name": None, "fio": "Иванов Иван"}],
+        teachers=[
+            {
+                "first_name": "Иван",
+                "last_name": "Иванов",
+                "middle_name": None,
+                "fio": "Иванов Иван",
+            }
+        ],
     )
 
     assert len(event.teachers) == 1

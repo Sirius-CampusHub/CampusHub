@@ -13,7 +13,9 @@ class TopicModel {
 
   factory TopicModel.fromJson(Map<String, dynamic> json) {
     final repliesCountRaw =
-        json['repliesCount'] ?? json['responses_count'] ?? json['responsesCount'];
+        json['repliesCount'] ??
+        json['responses_count'] ??
+        json['responsesCount'];
     int repliesCount;
     if (repliesCountRaw is int) {
       repliesCount = repliesCountRaw;
@@ -30,10 +32,10 @@ class TopicModel {
         json['isAnonymous'] ??
         json['anonymous'] ??
         json['anon'];
-    final isAnonymous = isAnonymousRaw == true ||
+    final isAnonymous =
+        isAnonymousRaw == true ||
         (isAnonymousRaw is String && isAnonymousRaw.toLowerCase() == 'true') ||
         (isAnonymousRaw is num && isAnonymousRaw != 0);
-
 
     return TopicModel(
       id: idRaw?.toString() ?? '',

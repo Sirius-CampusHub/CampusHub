@@ -10,7 +10,8 @@ class ForumRepository {
   ForumRepository({
     required Dio dio,
     required FirebaseAuthDataSource authDataSource,
-  }) : _dio = dio, _authDataSource = authDataSource;
+  }) : _dio = dio,
+       _authDataSource = authDataSource;
 
   final List<TopicModel> _mockTopics = [
     const TopicModel(
@@ -43,20 +44,17 @@ class ForumRepository {
       }
       final response = await _dio.get(
         '/forum/topics',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $rawToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
+      print('=== RESPONSE DATA TYPE: ${response.data.runtimeType}');
+      print('=== RESPONSE DATA: ${response.data}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data
             .map(
-              (json) => TopicModel.fromJson(
-                Map<String, dynamic>.from(json as Map),
-              ),
+              (json) =>
+                  TopicModel.fromJson(Map<String, dynamic>.from(json as Map)),
             )
             .toList();
       } else {
@@ -64,9 +62,9 @@ class ForumRepository {
       }
     } on DioException catch (e) {
       throw Exception("Ошибка сети при загрузке топиков: ${e.message}");
-    }   catch (e) {
-     throw Exception("Неизвестная ошибка: $e");
-  }
+    } catch (e) {
+      throw Exception("Неизвестная ошибка: $e");
+    }
   }
 
 
@@ -85,12 +83,16 @@ class ForumRepository {
       final response = await _dio.post(
         '/forum/topics',
         data: formData,
-        options: Options(
-          headers: {'Authorization': 'Bearer $rawToken'},
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $rawToken'}),
       );
+      print('=== CREATE TOPIC RESPONSE status: ${response.statusCode}');
+      print('=== CREATE TOPIC RESPONSE data type: ${response.data.runtimeType}');
+      print('=== CREATE TOPIC RESPONSE data: ${response.data}');
     } on DioException catch (e) {
-
+      print('=== DIO EXCEPTION: ${e.message}');
+      print('=== RESPONSE status: ${e.response?.statusCode}');
+      print('=== RESPONSE data type: ${e.response?.data.runtimeType}');
+      print('=== RESPONSE data: ${e.response?.data}');
       if (e.response?.statusCode == 403) {
         throw Exception("Доступ запрещен. Вы не состоите в студсовете.");
       }

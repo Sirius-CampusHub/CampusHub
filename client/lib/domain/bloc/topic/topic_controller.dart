@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+
 import 'package:client/data/repository/topic_repository.dart';
 import 'package:client/domain/bloc/topic/topic_event.dart';
 import 'package:client/domain/bloc/topic/topic_state.dart';

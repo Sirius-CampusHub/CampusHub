@@ -1,3 +1,3 @@
-from database.models import Topics, Comments
+from database.models import Comments, Topics
 
 __all__ = ["Topics", "Comments"]

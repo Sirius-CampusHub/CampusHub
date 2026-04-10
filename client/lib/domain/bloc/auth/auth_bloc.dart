@@ -15,10 +15,9 @@ import 'package:client/data/repository/auth_repository.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
 
-  AuthBloc({
-    required AuthRepository authRepository,
-  }) : _authRepository = authRepository,
-       super(AuthInitial()) {
+  AuthBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(AuthInitial()) {
     on<AuthSignInRequested>(_onSignIn);
     on<AuthSignUpBasicRequested>(_onSignUpBasic);
     on<AuthCompleteRegistrationRequested>(_onCompleteRegistration);
@@ -28,8 +27,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _getProfileData(
-      AuthGetProfileDataRequested event,
-      Emitter<AuthState> emit,) async {
+    AuthGetProfileDataRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     late final usData;
     if (state is AuthAuthenticated) {
       usData = (state as AuthAuthenticated).profileModel;
@@ -39,8 +39,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     emit(AuthLoading());
     try {
-      final RegistrationProfileData regProf = await _authRepository.getProfileData();
-      final user = ProfileModel(registrationProfileData: regProf, userModel: usData.userModel);
+      final RegistrationProfileData regProf = await _authRepository
+          .getProfileData();
+      final user = ProfileModel(
+        registrationProfileData: regProf,
+        userModel: usData.userModel,
+      );
       emit(AuthAuthenticated(profileModel: user));
     } catch (e) {
       print(e.toString());
@@ -95,10 +99,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final UserModel user =
-          await _authRepository.completeRegistration(event.profile);
+      final UserModel user = await _authRepository.completeRegistration(
+        event.profile,
+      );
       await RegistrationDraftStorage.clearAll();
-      final authProfile = ProfileModel(registrationProfileData: event.profile, userModel: user);
+      final authProfile = ProfileModel(
+        registrationProfileData: event.profile,
+        userModel: user,
+      );
       emit(AuthAuthenticated(profileModel: authProfile));
     } catch (e) {
       print(e.toString());
@@ -130,11 +138,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await emit.forEach<AuthState>(
       _authRepository.userStream.asyncMap((user) async {
         if (user == null) return AuthUnauthenticated();
-        final needsProfileCompletion =
-            await _authRepository.shouldShowRegistrationForUid(user.id);
+        final needsProfileCompletion = await _authRepository
+            .shouldShowRegistrationForUid(user.id);
         if (needsProfileCompletion) return AuthAwaitingProfileCompletion();
         final us = await _authRepository.getProfileData();
-        return AuthAuthenticated(profileModel: ProfileModel(registrationProfileData: us, userModel: user));
+        return AuthAuthenticated(
+          profileModel: ProfileModel(
+            registrationProfileData: us,
+            userModel: user,
+          ),
+        );
       }),
       onData: (state) => state,
       onError: (e, stackTrace) => AuthError(error: e as Exception),

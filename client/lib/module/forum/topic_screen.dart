@@ -1,6 +1,3 @@
-import 'package:client/core/dependencies.dart';
-import 'package:client/domain/model/forum_models/comment_model.dart';
-import 'package:client/domain/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client/domain/bloc/topic/topic_event.dart';
 import 'package:client/domain/bloc/topic/topic_state.dart';
 import 'package:client/domain/bloc/topic/topic_controller.dart';
+
+import '../../core/dependencies.dart';
+import '../../domain/model/forum_models/comment_model.dart';
+import '../../domain/model/registration_profile.dart';
 
 
 class TopicScreen extends StatelessWidget {
@@ -182,6 +183,7 @@ class _TopicView extends StatelessWidget {
             child: Text('Ошибка: ${state.error}', style: const TextStyle(color: Colors.red)),
           );
         }
+
         return const SizedBox.shrink();
       },
     );

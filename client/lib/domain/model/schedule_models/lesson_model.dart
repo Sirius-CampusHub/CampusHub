@@ -19,7 +19,7 @@ class LessonModel {
     required this.numberPair,
   });
 
-  factory LessonModel.fromJson(Map<String, dynamic> json){
+  factory LessonModel.fromJson(Map<String, dynamic> json) {
     return LessonModel(
       name: json['teachers'][0]['fio'] ?? 'Неизвестный преподаватель',
       classroom: json['classroom'] ?? 'Универ',
@@ -39,7 +39,6 @@ class LessonModel {
   }
 }
 
-
 enum LessonType {
   lecture('Лекции'),
   seminar('Семинары'),
@@ -53,27 +52,25 @@ enum LessonType {
   const LessonType(this.russian);
 
   static LessonType? fromString(String type) =>
-      LessonType.values
-          .where((element) => element.russian == type)
-          .firstOrNull;
+      LessonType.values.where((element) => element.russian == type).firstOrNull;
 }
 
 extension LessonTypeStyle on LessonType {
   Color get color => switch (this) {
-    LessonType.lecture  => const Color(0xFF2E7D32),
-    LessonType.seminar  => const Color(0xFFE65100),
+    LessonType.lecture => const Color(0xFF2E7D32),
+    LessonType.seminar => const Color(0xFFE65100),
     LessonType.practise => const Color(0xFF1565C0),
-    LessonType.lab      => const Color(0xFF6A1B9A),
-    LessonType.exam     => const Color(0xFFC62828),
-    LessonType.other    => const Color(0xFF37474F),
+    LessonType.lab => const Color(0xFF6A1B9A),
+    LessonType.exam => const Color(0xFFC62828),
+    LessonType.other => const Color(0xFF37474F),
   };
 
   String get displayName => switch (this) {
-    LessonType.lecture  => 'Лекция',
-    LessonType.seminar  => 'Семинар',
+    LessonType.lecture => 'Лекция',
+    LessonType.seminar => 'Семинар',
     LessonType.practise => 'Практика',
-    LessonType.lab      => 'Лабораторная',
-    LessonType.exam     => 'Экзамен',
-    LessonType.other    => 'Прочее',
+    LessonType.lab => 'Лабораторная',
+    LessonType.exam => 'Экзамен',
+    LessonType.other => 'Прочее',
   };
 }

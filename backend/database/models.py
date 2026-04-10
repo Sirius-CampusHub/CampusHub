@@ -1,8 +1,10 @@
-from sqlalchemy import Column, String, Text, DateTime, Boolean
-from datetime import datetime, timezone
-import uuid
-from .database import Base
 import enum
+import uuid
+from datetime import datetime, timezone
+
+from sqlalchemy import Boolean, Column, DateTime, String, Text
+
+from .database import Base
 
 USER_AVATAR_EMOJI_MAX_LEN = 16
 USER_DISPLAY_NAME_MAX_LEN = 30
@@ -30,6 +32,7 @@ class News(Base):
 class UserRole(str, enum.Enum):
     student = "student"
     council = "council"
+
 
 class User(Base):
     __tablename__ = "users"

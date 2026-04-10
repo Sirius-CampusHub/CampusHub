@@ -25,7 +25,6 @@ import 'module/auth/auth_gate.dart';
 // Utils
 import 'utils/firebase_options.dart';
 
-
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -54,13 +53,22 @@ void main() async {
     firestoreDataSource: userFireStore,
   );
 
-  final newsRepository = NewsRepository(dio: dio, authDataSource: authDataSource);
+  final newsRepository = NewsRepository(
+    dio: dio,
+    authDataSource: authDataSource,
+  );
 
   final scheduleRepository = ScheduleRepository(dio: dio);
 
-  final topicRepository = TopicRepository(dio: dio, authDataSource: authDataSource);
+  final topicRepository = TopicRepository(
+    dio: dio,
+    authDataSource: authDataSource,
+  );
 
-  final forumRepository = ForumRepository(dio: dio, authDataSource: authDataSource);
+  final forumRepository = ForumRepository(
+    dio: dio,
+    authDataSource: authDataSource,
+  );
 
   final Dependencies dependencies = Dependencies(
     authRepository: authRepository,
@@ -75,10 +83,25 @@ void main() async {
       dependencies: dependencies,
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => ScheduleBloc(scheduleRepository: dependencies.scheduleRepository)),
-          BlocProvider(create: (_) => AuthBloc(authRepository: dependencies.authRepository)..add(AuthSubscriptionRequested())),
-          BlocProvider(create: (_) => NewsBloc(newsRepository: dependencies.newsRepository)),
-          BlocProvider(create: (_) => ForumBloc(repository: dependencies.forumRepository)..add(ForumLoadRequested())),
+          BlocProvider(
+            create: (_) => ScheduleBloc(
+              scheduleRepository: dependencies.scheduleRepository,
+            ),
+          ),
+          BlocProvider(
+            create: (_) =>
+                AuthBloc(authRepository: dependencies.authRepository)
+                  ..add(AuthSubscriptionRequested()),
+          ),
+          BlocProvider(
+            create: (_) =>
+                NewsBloc(newsRepository: dependencies.newsRepository),
+          ),
+          BlocProvider(
+            create: (_) =>
+                ForumBloc(repository: dependencies.forumRepository)
+                  ..add(ForumLoadRequested()),
+          ),
         ],
         child: MyApp(),
       ),
@@ -86,7 +109,6 @@ void main() async {
   );
 
   FlutterNativeSplash.remove();
-
 }
 
 class MyApp extends StatelessWidget {

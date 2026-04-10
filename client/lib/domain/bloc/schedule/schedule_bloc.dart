@@ -8,16 +8,21 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   final ScheduleRepository _scheduleRepository;
 
   ScheduleBloc({required ScheduleRepository scheduleRepository})
-      : _scheduleRepository = scheduleRepository,
-        super(ScheduleInitial()) {
-
+    : _scheduleRepository = scheduleRepository,
+      super(ScheduleInitial()) {
     on<ScheduleGetWeek>(_getWeek);
   }
 
-  Future<void> _getWeek(ScheduleGetWeek event, Emitter<ScheduleState> emit) async {
+  Future<void> _getWeek(
+    ScheduleGetWeek event,
+    Emitter<ScheduleState> emit,
+  ) async {
     emit(SchedulePending());
     try {
-      final week = await _scheduleRepository.getSchedule(event.group, event.weekOffset);
+      final week = await _scheduleRepository.getSchedule(
+        event.group,
+        event.weekOffset,
+      );
       emit(ScheduleHasWeek(week: week));
     } catch (e, stacktrace) {
       print(e);
